@@ -1,10 +1,10 @@
 import streamlit as st
 from datetime import datetime
 
-# 1. KONFIGURASI HALAMAN
-st.set_page_config(page_title="Aplikasi SPT & SPPD Ngada", layout="wide")
+# 1. KONFIGURASI HALAMAN WIDE (Agar Layar Penuh)
+st.set_page_config(page_title="Otomasi SPT & SPPD Ngada", layout="wide")
 
-# 2. CSS UNTUK PRESISI CETAK A4
+# 2. CSS UNTUK PRESISI A4 & LAYOUT BERDAMPINGAN
 st.markdown("""
 <style>
     @media print {
@@ -17,6 +17,7 @@ st.markdown("""
             padding: 10mm 15mm !important;
             border: none !important;
             box-sizing: border-box;
+            page-break-after: always;
         }
     }
     .kertas-a4 {
@@ -24,32 +25,36 @@ st.markdown("""
         padding: 15mm;
         margin: 10px auto;
         width: 210mm;
-        height: 297mm;
+        min-height: 297mm;
         color: black;
         font-family: Arial, sans-serif;
         font-size: 10pt;
         border: 1px solid #ddd;
         box-sizing: border-box;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .tabel-sppd {
         width: 100%;
-        height: 96%;
+        height: 250mm;
         border: 1.5px solid black;
         border-collapse: collapse;
         table-layout: fixed;
     }
-    .tabel-sppd td {
-        border: 1.5px solid black;
-        padding: 8px;
-        vertical-align: top;
-    }
+    .tabel-sppd td { border: 1.5px solid black; padding: 10px; vertical-align: top; }
     .text-center { text-align: center; }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. SIDEBAR INPUT (Satu kali input untuk semua dokumen)
-with st.sidebar:
-    st.header("⚙️ Data Input")
+# 3. FUNGSI TANGGAL INDO
+def format_indo(tgl):
+    bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+    return f"{tgl.day} {bulan[tgl.month-1]} {tgl.year}"
+
+# 4. PEMBAGIAN KOLOM (Kiri Input, Kanan Preview)
+col_input, col_preview = st.columns([1, 2])
+
+with col_input:
+    st.header("📋 Input Data")
     no_spt = st.text_input("Nomor SPT", "094/Perekonomian/2026")
     nama = st.text_input("Nama Pegawai", "RAYMUNDUS BENA, S.S., M.Hum")
     nip = st.text_input("NIP Pegawai", "19XXXXXXXXXXXXXX")
@@ -58,33 +63,39 @@ with st.sidebar:
     tujuan = st.text_input("Tujuan", "Kupang")
     tgl_pergi = st.date_input("Tanggal Berangkat", datetime(2026, 2, 9))
     tgl_kembali = st.date_input("Tanggal Kembali", datetime(2026, 2, 11))
+    
+    st.markdown("---")
+    if st.button("🖨️ Cetak Semua Dokumen"):
+        st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
-def format_indo(tgl):
-    bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
-    return f"{tgl.day} {bulan[tgl.month-1]} {tgl.year}"
-
-# 4. TAMPILAN TAB
-tab1, tab2 = st.tabs(["📄 Halaman Depan (SPT)", "📋 Halaman Belakang (SPPD)"])
-
-with tab1:
+with col_preview:
+    st.header("🔍 Pratinjau Dokumen")
+    
+    # --- HALAMAN DEPAN (SPT) ---
     st.markdown(f"""
     <div class="kertas-a4">
-        <h3 style="text-align:center; text-decoration:underline;">SURAT PERINTAH TUGAS</h3>
-        <p style="text-align:center;">Nomor: {no_spt}</p>
-        <br>
+        <h3 class="text-center" style="text-decoration:underline;">SURAT PERINTAH TUGAS</h3>
+        <p class="text-center">Nomor: {no_spt}</p>
+        <br><br>
         <p><b>MEMERINTAHKAN:</b></p>
-        <table style="width:100%">
+        <table style="width:100%; border:none;">
             <tr><td style="width:25%">Nama</td><td>: <b>{nama}</b></td></tr>
             <tr><td>NIP</td><td>: {nip}</td></tr>
             <tr><td>Jabatan</td><td>: {jabatan}</td></tr>
         </table>
-        <p>Untuk: {maksud} ke {tujuan} pada {format_indo(tgl_pergi)}.</p>
+        <br>
+        <p>Untuk: {maksud} ke {tujuan} pada tanggal {format_indo(tgl_pergi)} s/d {format_indo(tgl_kembali)}.</p>
+        <br><br><br>
+        <div style="margin-left:50%; text-align:center;">
+            <p>Dikeluarkan di: Bajawa</p>
+            <p>Pada Tanggal: {format_indo(datetime.now())}</p>
+            <br><b>BUPATI NGADA</b><br><br><br><br>
+            <u><b>{nama}</b></u>
+        </div>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("🖨️ Cetak SPT"):
-        st.components.v1.html("<script>window.parent.print();</script>")
 
-with tab2:
+    # --- HALAMAN BELAKANG (SPPD) ---
     st.markdown(f"""
     <div class="kertas-a4">
         <table class="tabel-sppd">
@@ -109,12 +120,10 @@ with tab2:
             <tr style="height: 22%;">
                 <td>V. Tiba Kembali di : Bajawa <br> &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_kembali)}</td>
                 <td>
-                    <div style="font-style:italic; font-size:8.5pt;">Telah diperiksa...</div>
-                    <div class="text-center" style="margin-top:15px;"><b>BUPATI NGADA</b><br><br><br><b>...................</b></div>
+                    <div style="font-style:italic; font-size:8.5pt;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan.</div>
+                    <div class="text-center" style="margin-top:15px;"><b>BUPATI NGADA</b><br><br><br><b>..........................................</b></div>
                 </td>
             </tr>
         </table>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("🖨️ Cetak SPPD Belakang"):
-        st.components.v1.html("<script>window.parent.print();</script>")
