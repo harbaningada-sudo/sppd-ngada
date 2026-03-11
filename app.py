@@ -127,4 +127,32 @@ if daftar:
     for p in daftar:
         # --- 2. SPD DEPAN ---
         st.markdown(f"""<div class="kertas-a4">
-            <div class="kop-surat
+            <div class="kop-surat"></div>
+            <h3 align="center" style="margin-bottom:20px;">SURAT PERJALANAN DINAS (SPD)</h3>
+            <table class="tabel-excel">
+                <tr><td width="5%">1.</td><td width="45%">Pejabat Pemberi Perintah</td><td>{pemberi}</td></tr>
+                <tr><td>2.</td><td>Nama Pegawai diperintah</td><td><b>{p['nama']}</b></td></tr>
+                <tr><td>3.</td><td>a. Pangkat dan Golongan<br>b. Jabatan / Instansi<br>c. Tingkat Biaya Perjalanan</td><td>{p['gol']}<br>{p['jab']}<br>Tingkat A</td></tr>
+                <tr><td>4.</td><td>Maksud Perjalanan Dinas</td><td>{maksud}</td></tr>
+                <tr><td>5.</td><td>Alat Angkut dipergunakan</td><td>{alat}</td></tr>
+                <tr><td>6.</td><td>a. Tempat Berangkat<br>b. Tempat Tujuan</td><td>Bajawa<br>{tujuan}</td></tr>
+                <tr><td>7.</td><td>a. Lamanya Perjalanan Dinas<br>b. Tanggal Berangkat<br>c. Tanggal harus kembali</td><td>{lama} Hari<br>{format_indo(tgl_p)}<br>{format_indo(tgl_k)}</td></tr>
+                <tr><td>8.</td><td>Pengikut : Nama</td><td>NIP / Keterangan</td></tr>
+                <tr><td height="40px"></td><td></td><td></td></tr>
+                <tr><td>9.</td><td>Pembebanan Anggaran<br>a. Instansi<br>b. Mata Anggaran</td><td><br>{dpa}<br>{mata_anggaran}</td></tr>
+            </table>
+            <div style="margin-left:55%; margin-top:35px; text-align:center;">
+                <p>Ditetapkan di: Bajawa</p>
+                <b>{pemberi.upper()}</b><br><br><br><br><b>{nama_ttd}</b>
+            </div>
+        </div>""", unsafe_allow_html=True)
+
+        # --- 3. SPD BELAKANG ---
+        st.markdown(f"""<div class="kertas-a4">
+            <table class="tabel-excel">
+                <tr style="height:6.5cm;"><td class="col-kiri"></td><td class="col-kanan">I. Berangkat dari: Bajawa<br>Ke: {tujuan}<br>Tanggal: {format_indo(tgl_p)}<div align="center"><br><b>{pemberi.upper()}</b><br><br><br><br><b>{nama_ttd}</b></div></td></tr>
+                <tr style="height:5.5cm;"><td>II. Tiba di: {tujuan}<br>Tanggal: {format_indo(tgl_p)}</td><td>Berangkat dari: {tujuan}<br>Ke: Bajawa<br>Tanggal: {format_indo(tgl_k)}</td></tr>
+                <tr style="height:5.5cm;"><td>III. Tiba di:</td><td>Berangkat dari:</td></tr>
+                <tr style="height:6.5cm;"><td>V. Tiba Kembali: Bajawa<br>Tanggal: {format_indo(tgl_k)}</td><td><div align="center" style="font-style:italic; font-size:9pt;">Telah diperiksa dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan.</div><div align="center" style="margin-top:20px;"><b>{pemberi.upper()}</b><br><br><br><br><b>....................</b></div></td></tr>
+            </table>
+        </div>""", unsafe_allow_html=True)
