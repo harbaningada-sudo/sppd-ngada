@@ -1,69 +1,107 @@
 import streamlit as st
 from datetime import datetime
 
-# 1. KONFIGURASI HALAMAN WIDE
-st.set_page_config(page_title="Otomasi SPT Multi-Pegawai", layout="wide")
+# 1. KONFIGURASI HALAMAN & HILANGKAN SIDEBAR STREAMLIT
+st.set_page_config(page_title="Sistem SPT & SPPD Ngada", layout="wide")
 
-# 2. CSS PRESISI A4
 st.markdown("""
 <style>
-    @media print {
-        header, footer, .stSidebar, .stButton, .no-print { display: none !important; }
-        @page { size: A4; margin: 0; }
-        .kertas-a4 {
-            width: 210mm !important;
-            height: 297mm !important;
-            margin: 0 !important;
-            padding: 10mm 15mm !important;
-            border: none !important;
-            box-sizing: border-box;
-            page-break-after: always;
-        }
+    /* Menghilangkan elemen default Streamlit agar bersih */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Layout Berdampingan */
+    .container {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
     }
+    
+    /* Area Input (Kiri) */
+    .input-panel {
+        width: 30%;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #ddd;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    /* Area Preview (Kanan) */
+    .preview-panel {
+        width: 70%;
+        background-color: #525659; /* Warna gelap seperti PDF viewer */
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    /* Kertas A4 Presisi */
     .kertas-a4 {
         background-color: white;
-        padding: 15mm;
-        margin: 10px auto;
         width: 210mm;
         min-height: 297mm;
+        padding: 15mm 20mm;
+        margin: 0 auto 20px auto;
         color: black;
-        font-family: Arial, sans-serif;
-        font-size: 10pt;
-        border: 1px solid #ddd;
+        font-family: "Arial", sans-serif;
+        font-size: 11pt;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
         box-sizing: border-box;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     .tabel-sppd {
         width: 100%;
-        height: 250mm;
         border: 1.5px solid black;
         border-collapse: collapse;
+        table-layout: fixed;
     }
-    .tabel-sppd td { border: 1.5px solid black; padding: 10px; vertical-align: top; }
-    .text-center { text-align: center; }
+    .tabel-sppd td {
+        border: 1.5px solid black;
+        padding: 8px;
+        vertical-align: top;
+        height: 4.5cm;
+    }
+
+    /* CSS Khusus Cetak */
+    @media print {
+        .no-print, .stButton, .input-panel { display: none !important; }
+        .preview-panel { width: 100% !important; background: none !important; padding: 0 !important; }
+        .kertas-a4 { 
+            margin: 0 !important; 
+            box-shadow: none !important; 
+            border: none !important;
+            page-break-after: always;
+        }
+        @page { size: A4; margin: 0; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
+# 2. FUNGSI TANGGAL INDONESIA
 def format_indo(tgl):
     bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
     return f"{tgl.day} {bulan[tgl.month-1]} {tgl.year}"
 
-# 3. SIDEBAR INPUT
-with st.sidebar:
-    st.header("📋 Data Surat")
+# 3. STRUKTUR APLIKASI
+# Menggunakan kolom streamlit agar tetap responsif tapi dengan style kita
+col_kiri, col_kanan = st.columns([1, 2.5])
+
+with col_kiri:
+    st.subheader("📋 Input Data")
     no_spt = st.text_input("Nomor SPT", "094/Perekonomian/2026")
-    maksud = st.text_area("Maksud Tugas", "Perjalanan Dinas dalam rangka...")
+    maksud = st.text_area("Maksud Tugas", "Perjalanan Dinas...")
     tujuan = st.text_input("Tujuan", "Kupang")
-    tgl_pergi = st.date_input("Tanggal Berangkat", datetime(2026, 2, 9))
-    tgl_kembali = st.date_input("Tanggal Kembali", datetime(2026, 2, 11))
+    tgl_pergi = st.date_input("Berangkat", datetime(2026, 2, 9))
+    tgl_kembali = st.date_input("Kembali", datetime(2026, 2, 11))
     
     st.markdown("---")
-    st.header("👥 Data Pegawai")
-    # Fitur Multi-Pegawai menggunakan text_area (satu baris satu nama)
-    input_pegawai = st.text_area("Masukkan Nama & NIP (Format: Nama | NIP)", 
-                                 "RAYMUNDUS BENA, S.S., M.Hum | 19XXXXXXXXXXXXXX\nPEGAWAI KEDUA, S.T | 19YYYYYYYYYYYYYY")
+    st.write("👥 **Daftar Pegawai**")
+    input_pegawai = st.text_area("Nama | NIP (Per Baris)", 
+                                 "RAYMUNDUS BENA, S.S., M.Hum | 19XXXXXXXXXXXXXX\nNAMA PEGAWAI LAIN | 19YYYYYYYYYYYYYY")
     
-    # Memproses input menjadi list
     daftar_pegawai = []
     for line in input_pegawai.split('\n'):
         if '|' in line:
@@ -71,69 +109,68 @@ with st.sidebar:
             daftar_pegawai.append({"nama": n.strip(), "nip": ni.strip()})
 
     st.markdown("---")
-    if st.button("🖨️ Cetak Semua"):
+    if st.button("🖨️ CETAK SEKARANG"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
-# 4. PREVIEW DI SEBELAH KANAN
-# Kita gunakan perulangan agar setiap pegawai punya halaman SPPD sendiri
-if daftar_pegawai:
-    # --- HALAMAN 1: SPT (Daftar Semua Nama) ---
-    st.subheader("Halaman Depan: SPT")
-    rows_pegawai = "".join([f"<tr><td>{i+1}.</td><td>{p['nama']}</td><td>{p['nip']}</td></tr>" for i, p in enumerate(daftar_pegawai)])
-    
-    st.markdown(f"""
-    <div class="kertas-a4">
-        <h3 class="text-center" style="text-decoration:underline;">SURAT PERINTAH TUGAS</h3>
-        <p class="text-center">Nomor: {no_spt}</p>
-        <br>
-        <p><b>MEMERINTAHKAN:</b></p>
-        <table style="width:100%; border-collapse: collapse;" border="1">
-            <tr style="background-color: #f2f2f2;"><th>No</th><th>Nama</th><th>NIP</th></tr>
-            {rows_pegawai}
-        </table>
-        <br>
-        <p>Untuk: {maksud} ke {tujuan} pada tanggal {format_indo(tgl_pergi)} s/d {format_indo(tgl_kembali)}.</p>
-        <div style="margin-left:50%; text-align:center; margin-top:50px;">
-            <p>Dikeluarkan di: Bajawa</p>
-            <br><b>BUPATI NGADA</b><br><br><br><br>
-            <u><b>RAYMUNDUS BENA, S.S., M.Hum</b></u>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # --- HALAMAN BERIKUTNYA: SPPD BELAKANG UNTUK TIAP PEGAWAI ---
-    for p in daftar_pegawai:
-        st.subheader(f"Halaman Belakang: SPPD - {p['nama']}")
+with col_kanan:
+    if daftar_pegawai:
+        # --- HALAMAN DEPAN ---
+        rows = "".join([f"<tr><td style='text-align:center;'>{i+1}</td><td>{p['nama']}</td><td>{p['nip']}</td></tr>" for i, p in enumerate(daftar_pegawai)])
         st.markdown(f"""
         <div class="kertas-a4">
-            <table class="tabel-sppd">
-                <tr style="height: 20%;">
-                    <td style="width: 42%;"></td>
-                    <td style="width: 58%;">
-                        I. &nbsp; Berangkat dari : Bajawa <br>
-                        &nbsp;&nbsp;&nbsp;&nbsp; Ke : {tujuan} <br>
-                        &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_pergi)} <br>
-                        <div class="text-center" style="margin-top:15px;">
-                            <b>BUPATI NGADA</b><br><br><br><br>
-                            <u><b>{p['nama']}</b></u>
-                        </div>
-                    </td>
+            <h3 style="text-align:center; text-decoration:underline; margin-bottom:5px;">SURAT PERINTAH TUGAS</h3>
+            <p style="text-align:center; margin-top:0;">Nomor: {no_spt}</p>
+            <br>
+            <p><b>MEMERINTAHKAN:</b></p>
+            <table border="1" style="width:100%; border-collapse:collapse;">
+                <tr style="background:#eee;">
+                    <th style="width:10%;">No</th><th>Nama</th><th>NIP</th>
                 </tr>
-                <tr style="height: 18%;">
-                    <td>II. Tiba di : {tujuan} <br> &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_pergi)}</td>
-                    <td>Berangkat dari : {tujuan} <br> Ke : Bajawa <br> Pada Tanggal : {format_indo(tgl_kembali)}</td>
-                </tr>
-                <tr style="height: 18%;"><td>III. Tiba di :</td><td>Berangkat dari :</td></tr>
-                <tr style="height: 18%;"><td>IV. Tiba di :</td><td>Berangkat dari :</td></tr>
-                <tr style="height: 22%;">
-                    <td>V. Tiba Kembali di : Bajawa <br> &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_kembali)}</td>
-                    <td>
-                        <div style="font-style:italic; font-size:8pt;">Telah diperiksa...</div>
-                        <div class="text-center" style="margin-top:15px;"><b>BUPATI NGADA</b><br><br><br><b>...................</b></div>
-                    </td>
-                </tr>
+                {rows}
             </table>
+            <br>
+            <p>Untuk: {maksud} ke {tujuan} pada tanggal {format_indo(tgl_pergi)} s/d {format_indo(tgl_kembali)}.</p>
+            <div style="margin-left:55%; margin-top:50px; text-align:center;">
+                <p>Bajawa, {format_indo(datetime.now())}</p>
+                <b>BUPATI NGADA</b><br><br><br><br>
+                <u><b>RAYMUNDUS BENA, S.S., M.Hum</b></u>
+            </div>
         </div>
         """, unsafe_allow_html=True)
-else:
-    st.error("Silakan masukkan data pegawai di sidebar (Nama | NIP)")
+
+        # --- HALAMAN BELAKANG (PER PEGAWAI) ---
+        for p in daftar_pegawai:
+            st.markdown(f"""
+            <div class="kertas-a4">
+                <table class="tabel-sppd">
+                    <tr style="height: 5cm;">
+                        <td style="width: 45%;"></td>
+                        <td>
+                            I. &nbsp; Berangkat dari : Bajawa <br>
+                            &nbsp;&nbsp;&nbsp;&nbsp; Ke : {tujuan} <br>
+                            &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_pergi)} <br>
+                            <div style="text-align:center; margin-top:20px;">
+                                <b>BUPATI NGADA</b><br><br><br><br>
+                                <u><b>{p['nama']}</b></u>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>II. Tiba : {tujuan}<br>Tgl: {format_indo(tgl_pergi)}</td>
+                        <td>Berangkat dari : {tujuan}<br>Ke: Bajawa<br>Tgl: {format_indo(tgl_kembali)}</td>
+                    </tr>
+                    <tr><td>III. Tiba di :</td><td>Berangkat dari :</td></tr>
+                    <tr><td>IV. Tiba di :</td><td>Berangkat dari :</td></tr>
+                    <tr style="height: 5cm;">
+                        <td>V. Tiba Kembali : Bajawa<br>Tgl: {format_indo(tgl_kembali)}</td>
+                        <td>
+                            <div style="font-style:italic; font-size:9pt;">Telah diperiksa...</div>
+                            <div style="text-align:center; margin-top:20px;">
+                                <b>BUPATI NGADA</b><br><br><br>
+                                <b>.......................................</b>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            """, unsafe_allow_html=True)
