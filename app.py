@@ -1,10 +1,10 @@
 import streamlit as st
 from datetime import datetime
 
-# 1. KONFIGURASI HALAMAN WIDE (Agar Layar Penuh)
-st.set_page_config(page_title="Otomasi SPT & SPPD Ngada", layout="wide")
+# 1. KONFIGURASI HALAMAN WIDE
+st.set_page_config(page_title="Otomasi SPT Multi-Pegawai", layout="wide")
 
-# 2. CSS UNTUK PRESISI A4 & LAYOUT BERDAMPINGAN
+# 2. CSS PRESISI A4
 st.markdown("""
 <style>
     @media print {
@@ -38,92 +38,102 @@ st.markdown("""
         height: 250mm;
         border: 1.5px solid black;
         border-collapse: collapse;
-        table-layout: fixed;
     }
     .tabel-sppd td { border: 1.5px solid black; padding: 10px; vertical-align: top; }
     .text-center { text-align: center; }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. FUNGSI TANGGAL INDO
 def format_indo(tgl):
     bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
     return f"{tgl.day} {bulan[tgl.month-1]} {tgl.year}"
 
-# 4. PEMBAGIAN KOLOM (Kiri Input, Kanan Preview)
-col_input, col_preview = st.columns([1, 2])
-
-with col_input:
-    st.header("📋 Input Data")
+# 3. SIDEBAR INPUT
+with st.sidebar:
+    st.header("📋 Data Surat")
     no_spt = st.text_input("Nomor SPT", "094/Perekonomian/2026")
-    nama = st.text_input("Nama Pegawai", "RAYMUNDUS BENA, S.S., M.Hum")
-    nip = st.text_input("NIP Pegawai", "19XXXXXXXXXXXXXX")
-    jabatan = st.text_input("Jabatan", "Kepala Bagian Perekonomian & SDA")
     maksud = st.text_area("Maksud Tugas", "Perjalanan Dinas dalam rangka...")
     tujuan = st.text_input("Tujuan", "Kupang")
     tgl_pergi = st.date_input("Tanggal Berangkat", datetime(2026, 2, 9))
     tgl_kembali = st.date_input("Tanggal Kembali", datetime(2026, 2, 11))
     
     st.markdown("---")
-    if st.button("🖨️ Cetak Semua Dokumen"):
+    st.header("👥 Data Pegawai")
+    # Fitur Multi-Pegawai menggunakan text_area (satu baris satu nama)
+    input_pegawai = st.text_area("Masukkan Nama & NIP (Format: Nama | NIP)", 
+                                 "RAYMUNDUS BENA, S.S., M.Hum | 19XXXXXXXXXXXXXX\nPEGAWAI KEDUA, S.T | 19YYYYYYYYYYYYYY")
+    
+    # Memproses input menjadi list
+    daftar_pegawai = []
+    for line in input_pegawai.split('\n'):
+        if '|' in line:
+            n, ni = line.split('|')
+            daftar_pegawai.append({"nama": n.strip(), "nip": ni.strip()})
+
+    st.markdown("---")
+    if st.button("🖨️ Cetak Semua"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
-with col_preview:
-    st.header("🔍 Pratinjau Dokumen")
+# 4. PREVIEW DI SEBELAH KANAN
+# Kita gunakan perulangan agar setiap pegawai punya halaman SPPD sendiri
+if daftar_pegawai:
+    # --- HALAMAN 1: SPT (Daftar Semua Nama) ---
+    st.subheader("Halaman Depan: SPT")
+    rows_pegawai = "".join([f"<tr><td>{i+1}.</td><td>{p['nama']}</td><td>{p['nip']}</td></tr>" for i, p in enumerate(daftar_pegawai)])
     
-    # --- HALAMAN DEPAN (SPT) ---
     st.markdown(f"""
     <div class="kertas-a4">
         <h3 class="text-center" style="text-decoration:underline;">SURAT PERINTAH TUGAS</h3>
         <p class="text-center">Nomor: {no_spt}</p>
-        <br><br>
+        <br>
         <p><b>MEMERINTAHKAN:</b></p>
-        <table style="width:100%; border:none;">
-            <tr><td style="width:25%">Nama</td><td>: <b>{nama}</b></td></tr>
-            <tr><td>NIP</td><td>: {nip}</td></tr>
-            <tr><td>Jabatan</td><td>: {jabatan}</td></tr>
+        <table style="width:100%; border-collapse: collapse;" border="1">
+            <tr style="background-color: #f2f2f2;"><th>No</th><th>Nama</th><th>NIP</th></tr>
+            {rows_pegawai}
         </table>
         <br>
         <p>Untuk: {maksud} ke {tujuan} pada tanggal {format_indo(tgl_pergi)} s/d {format_indo(tgl_kembali)}.</p>
-        <br><br><br>
-        <div style="margin-left:50%; text-align:center;">
+        <div style="margin-left:50%; text-align:center; margin-top:50px;">
             <p>Dikeluarkan di: Bajawa</p>
-            <p>Pada Tanggal: {format_indo(datetime.now())}</p>
             <br><b>BUPATI NGADA</b><br><br><br><br>
-            <u><b>{nama}</b></u>
+            <u><b>RAYMUNDUS BENA, S.S., M.Hum</b></u>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # --- HALAMAN BELAKANG (SPPD) ---
-    st.markdown(f"""
-    <div class="kertas-a4">
-        <table class="tabel-sppd">
-            <tr style="height: 20%;">
-                <td style="width: 42%;"></td>
-                <td style="width: 58%;">
-                    I. &nbsp; Berangkat dari : Bajawa <br>
-                    &nbsp;&nbsp;&nbsp;&nbsp; Ke : {tujuan} <br>
-                    &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_pergi)} <br>
-                    <div class="text-center" style="margin-top:15px;">
-                        <b>BUPATI NGADA</b><br><br><br><br>
-                        <u><b>{nama}</b></u>
-                    </div>
-                </td>
-            </tr>
-            <tr style="height: 18%;">
-                <td>II. Tiba di : {tujuan} <br> &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_pergi)}</td>
-                <td>Berangkat dari : {tujuan} <br> Ke : Bajawa <br> Pada Tanggal : {format_indo(tgl_kembali)}</td>
-            </tr>
-            <tr style="height: 18%;"><td>III. Tiba di :</td><td>Berangkat dari :</td></tr>
-            <tr style="height: 18%;"><td>IV. Tiba di :</td><td>Berangkat dari :</td></tr>
-            <tr style="height: 22%;">
-                <td>V. Tiba Kembali di : Bajawa <br> &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_kembali)}</td>
-                <td>
-                    <div style="font-style:italic; font-size:8.5pt;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan.</div>
-                    <div class="text-center" style="margin-top:15px;"><b>BUPATI NGADA</b><br><br><br><b>..........................................</b></div>
-                </td>
-            </tr>
-        </table>
-    </div>
-    """, unsafe_allow_html=True)
+    # --- HALAMAN BERIKUTNYA: SPPD BELAKANG UNTUK TIAP PEGAWAI ---
+    for p in daftar_pegawai:
+        st.subheader(f"Halaman Belakang: SPPD - {p['nama']}")
+        st.markdown(f"""
+        <div class="kertas-a4">
+            <table class="tabel-sppd">
+                <tr style="height: 20%;">
+                    <td style="width: 42%;"></td>
+                    <td style="width: 58%;">
+                        I. &nbsp; Berangkat dari : Bajawa <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp; Ke : {tujuan} <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_pergi)} <br>
+                        <div class="text-center" style="margin-top:15px;">
+                            <b>BUPATI NGADA</b><br><br><br><br>
+                            <u><b>{p['nama']}</b></u>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="height: 18%;">
+                    <td>II. Tiba di : {tujuan} <br> &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_pergi)}</td>
+                    <td>Berangkat dari : {tujuan} <br> Ke : Bajawa <br> Pada Tanggal : {format_indo(tgl_kembali)}</td>
+                </tr>
+                <tr style="height: 18%;"><td>III. Tiba di :</td><td>Berangkat dari :</td></tr>
+                <tr style="height: 18%;"><td>IV. Tiba di :</td><td>Berangkat dari :</td></tr>
+                <tr style="height: 22%;">
+                    <td>V. Tiba Kembali di : Bajawa <br> &nbsp;&nbsp;&nbsp;&nbsp; Pada Tanggal : {format_indo(tgl_kembali)}</td>
+                    <td>
+                        <div style="font-style:italic; font-size:8pt;">Telah diperiksa...</div>
+                        <div class="text-center" style="margin-top:15px;"><b>BUPATI NGADA</b><br><br><br><b>...................</b></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        """, unsafe_allow_html=True)
+else:
+    st.error("Silakan masukkan data pegawai di sidebar (Nama | NIP)")
