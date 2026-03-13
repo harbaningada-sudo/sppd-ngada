@@ -29,7 +29,6 @@ st.markdown("""
         padding-bottom: 5px;
         margin-bottom: 20px;
     }
-    .kop-header h2, .kop-header h3 { margin: 0; padding: 0; }
 
     .tabel-data {
         width: 100%;
@@ -77,8 +76,8 @@ with st.sidebar:
     if st.button("🖨️ PRINT SPT"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
-# 3. RENDER SPT (PAKAI st.markdown DENGAN unsafe_allow_html=True)
-spt_html = f"""
+# 3. RENDER SPT LANGSUNG (TIDAK PAKAI VARIABEL TERPISAH)
+st.markdown(f"""
 <div class="kertas-a4">
     <div class="kop-header">
         <h3 class="text-bold">PEMERINTAH KABUPATEN NGADA</h3>
@@ -140,9 +139,9 @@ spt_html = f"""
         </tr>
     </table>
 
-    <div style="margin-left:55%; margin-top:40px;">
+    <div style="margin-left:50%; margin-top:40px;">
         <table class="tabel-data">
-            <tr><td width="40%">Ditetapkan di</td><td>:</td><td>Bajawa</td></tr>
+            <tr><td width="45%">Ditetapkan di</td><td>:</td><td>Bajawa</td></tr>
             <tr><td>Pada Tanggal</td><td>:</td><td>{format_indo(tgl_tetap)}</td></tr>
         </table>
         
@@ -156,7 +155,4 @@ spt_html = f"""
         </div>
     </div>
 </div>
-"""
-
-# INI BAGIAN PENTINGNYA, BRO!
-st.markdown(spt_html, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
