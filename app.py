@@ -4,54 +4,6 @@ from datetime import datetime
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Cetak SPT Prokopim Ngada", layout="wide")
 
-st.markdown("""
-<style>
-    header, footer, #MainMenu {visibility: hidden;}
-    .stDeployButton {display:none;}
-    .main { background-color: #525659; }
-
-    .kertas-a4 {
-        background-color: white;
-        width: 210mm;
-        min-height: 297mm;
-        padding: 10mm 20mm 20mm 25mm;
-        margin: 10px auto;
-        color: black;
-        font-family: "Arial", sans-serif;
-        font-size: 11pt;
-        box-shadow: 0 0 15px rgba(0,0,0,0.5);
-        box-sizing: border-box;
-    }
-
-    .kop-header {
-        text-align: center;
-        border-bottom: 3px solid black;
-        padding-bottom: 5px;
-        margin-bottom: 20px;
-    }
-
-    .tabel-data {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-    }
-    .tabel-data td {
-        border: none !important;
-        padding: 2px 0;
-        vertical-align: top;
-    }
-
-    .text-center { text-align: center; }
-    .text-bold { font-weight: bold; }
-    .text-underline { text-decoration: underline; }
-    .text-justify { text-align: justify; }
-</style>
-""", unsafe_allow_html=True)
-
-def format_indo(tgl):
-    bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
-    return f"{tgl.day} {bulan[tgl.month-1]} {tgl.year}"
-
 # 2. PANEL INPUT SIDEBAR
 with st.sidebar:
     st.header("📋 INPUT DATA SPT")
@@ -76,14 +28,61 @@ with st.sidebar:
     if st.button("🖨️ PRINT SPT"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
-# 3. RENDER SPT LANGSUNG (TIDAK PAKAI VARIABEL TERPISAH)
+# FUNGSI FORMAT TANGGAL
+def format_indo(tgl):
+    bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+    return f"{tgl.day} {bulan[tgl.month-1]} {tgl.year}"
+
+# 3. RENDER TAMPILAN (CSS DAN HTML DISATUKAN)
 st.markdown(f"""
+<style>
+    header, footer, #MainMenu {{visibility: hidden;}}
+    .stDeployButton {{display:none;}}
+    .main {{ background-color: #525659; }}
+
+    .kertas-a4 {{
+        background-color: white;
+        width: 210mm;
+        min-height: 297mm;
+        padding: 10mm 20mm 20mm 25mm;
+        margin: 10px auto;
+        color: black;
+        font-family: "Arial", sans-serif;
+        font-size: 11pt;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        box-sizing: border-box;
+    }}
+
+    .kop-header {{
+        text-align: center;
+        border-bottom: 3px solid black;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+    }}
+
+    .tabel-data {{
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+    }}
+    .tabel-data td {{
+        border: none !important;
+        padding: 2px 0;
+        vertical-align: top;
+    }}
+
+    .text-center {{ text-align: center; }}
+    .text-bold {{ font-weight: bold; }}
+    .text-underline {{ text-decoration: underline; }}
+    .text-justify {{ text-align: justify; }}
+</style>
+
 <div class="kertas-a4">
     <div class="kop-header">
-        <h3 class="text-bold">PEMERINTAH KABUPATEN NGADA</h3>
-        <h3 class="text-bold">SEKRETARIAT DAERAH</h3>
+        <h3 class="text-bold" style="margin:0;">PEMERINTAH KABUPATEN NGADA</h3>
+        <h3 class="text-bold" style="margin:0;">SEKRETARIAT DAERAH</h3>
         <p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 21012</p>
-        <h3 class="text-bold">BAJAWA</h3>
+        <h3 class="text-bold" style="margin:0;">BAJAWA</h3>
     </div>
 
     <h3 class="text-center text-bold text-underline" style="margin-bottom:0;">SURAT PERINTAH TUGAS</h3>
