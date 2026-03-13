@@ -1,5 +1,7 @@
 import streamlit as st
 from datetime import datetime
+import base64
+from pathlib import Path
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
@@ -7,10 +9,33 @@ st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
 st.markdown("""
 <style>
     header, footer, #MainMenu { visibility: hidden; }
-    .stDeployButton { display:none; }
+    .stDeployButton {display:none; }
     .main { background-color: #525659; }
 </style>
 """, unsafe_allow_html=True)
+
+# FUNGSI UNTUK MENGUBAH GAMBAR LOKAL MENJADI BASE64
+def get_image_as_base64(path):
+    try:
+        with open(path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode()
+    except FileNotFoundError:
+        return None
+
+# TENTUKAN PATH KE LOGO ANDA
+# Pastikan file Logo.jpg ada di folder yang sama dengan app.py
+logo_path = Path("Logo.jpg")
+
+# CEK APAKAH LOGO ADA, JIKA ADA UBAH KE BASE64
+logo_base64 = get_image_as_base64(logo_path)
+
+if logo_base64:
+    # Membuat tag IMG HTML dengan data Base64
+    logo_html = f'<img src="data:image/jpeg;base64,{logo_base64}" class="logo-img">'
+else:
+    # Jika logo tidak ditemukan, berikan pesan kesalahan di Streamlit
+    st.error(f"File gambar '{logo_path.name}' tidak ditemukan di folder yang sama dengan app.py.")
+    logo_html = "" # Teks kosong jika logo tidak ada
 
 # 2. PANEL INPUT SIDEBAR
 with st.sidebar:
@@ -52,7 +77,35 @@ surat_html = f"""
 <style>
     .wrap {{ background-color: #525659; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 25px; }}
     .kertas {{ background-color: white; width: 210mm; min-height: 297mm; padding: 15mm 20mm 20mm 25mm; color: black; font-family: Arial, sans-serif; font-size: 10pt; box-shadow: 0 0 15px rgba(0,0,0,0.5); box-sizing: border-box; page-break-after: always; }}
-    .kop {{ text-align: center; border-bottom: 3px solid black; padding-bottom: 2px; margin-bottom: 15px; line-height: 1.2; }}
+    
+    /* GAYA UNTUK KOP SURAT DENGAN LOGO (UNTUK SPT & SPPD DEPAN) */
+    .kop-container {{
+        display: flex;
+        align-items: center; /* Sejajarkan logo dan teks secara vertikal di tengah */
+        border-bottom: 3px solid black;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+    }}
+    .logo-img {{
+        width: 80px; /* Atur lebar logo sesuai kebutuhan */
+        height: auto; /* Jaga proporsi tinggi logo */
+        margin-right: 20px; /* Beri jarak antara logo dan teks kop */
+    }}
+    .kop-text {{
+        flex: 1; /* Biarkan teks mengambil sisa ruang yang tersedia */
+        text-align: center;
+        line-height: 1.2;
+    }}
+    
+    /* GAYA UNTUK KOP SURAT TANPA LOGO (UNTUK SPPD BELAKANG) */
+    .kop-tanpa-logo {{
+        text-align: center;
+        border-bottom: 3px solid black;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+        line-height: 1.2;
+    }}
+    
     .tabel-polos {{ width: 100%; border-collapse: collapse; }}
     .tabel-polos td {{ border: none; padding: 2px; vertical-align: top; }}
     .tabel-border {{ width: 100%; border-collapse: collapse; border: 1.2px solid black; }}
@@ -64,11 +117,13 @@ surat_html = f"""
 
 <div class="wrap">
     <div class="kertas">
-        <div class="kop">
-            <h3 style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
-            <h2 style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h2>
-            <p style="margin:0; font-size: 10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
-            <h3 style="margin:0; font-size: 14pt;">BAJAWA</h3>
+        <div class="kop-container">
+            {logo_html} <div class="kop-text">
+                <h3 style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
+                <h2 style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h2>
+                <p style="margin:0; font-size: 10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
+                <h3 style="margin:0; font-size: 14pt;">BAJAWA</h3>
+            </div>
         </div>
         <h3 class="text-center text-bold text-underline">SURAT PERINTAH TUGAS</h3>
         <p class="text-center" style="margin-top:-10px;">NOMOR : {no_spt}</p>
@@ -99,11 +154,13 @@ surat_html = f"""
     </div>
 
     <div class="kertas">
-        <div class="kop">
-            <h3 style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
-            <h2 style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h2>
-            <p style="margin:0; font-size: 10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
-            <h3 style="margin:0; font-size: 14pt;">BAJAWA</h3>
+        <div class="kop-container">
+            {logo_html} <div class="kop-text">
+                <h3 style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
+                <h2 style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h2>
+                <p style="margin:0; font-size: 10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
+                <h3 style="margin:0; font-size: 14pt;">BAJAWA</h3>
+            </div>
         </div>
         <div style="margin-left: 60%;">
             <table class="tabel-polos" style="font-size: 9pt;">
@@ -112,8 +169,8 @@ surat_html = f"""
                 <tr><td>Nomor</td><td>:</td><td>{no_spd}</td></tr>
             </table>
         </div>
-        <h3 class="text-center text-bold text-underline" style="margin-top:10px; margin-bottom:0;">SURAT PERJALANAN DINAS</h3>
-        <p class="text-center text-bold" style="margin-top:0;">(SPD)</p>
+        <h3 class="text-center text-bold text-underline" style="margin-top:10px; margin-bottom:0;">SURAT PERINTAH DINAS</h3>
+        <p class="text-center" style="margin-top:0;">(SPD)</p>
         <table class="tabel-border">
             <tr><td width="5%">1.</td><td width="40%">Pejabat yang memberi perintah</td><td>BUPATI NGADA</td></tr>
             <tr><td>2.</td><td>Nama Pegawai yang diperintahkan</td><td class="text-bold">{nama}</td></tr>
@@ -140,6 +197,13 @@ surat_html = f"""
     </div>
 
     <div class="kertas">
+        <div class="kop-tanpa-logo">
+            <h3 style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
+            <h2 style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h2>
+            <p style="margin:0; font-size: 10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
+            <h3 style="margin:0; font-size: 14pt;">BAJAWA</h3>
+        </div>
+        
         <table class="tabel-border">
             <tr style="height: 200px;">
                 <td width="45%"></td>
@@ -173,4 +237,4 @@ surat_html = f"""
 </div>
 """
 
-st.components.v1.html(surat_html, height=4200, scrolling=True)
+st.components.v1.html(surat_html, height=4500, scrolling=True)
