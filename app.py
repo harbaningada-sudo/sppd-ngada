@@ -1,5 +1,7 @@
 import streamlit as st
 from datetime import datetime
+import pandas as pd
+import io
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
@@ -23,7 +25,7 @@ logo_data_url = """data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAwAAAAMMCAYAAAD
 if len(logo_data_url) > 100:
     logo_html = f'<img src="{logo_data_url}" style="width: 75px; height: auto; margin-right: 20px;">'
 else:
-    logo_html = '<div style="width: 75px;"></div>'
+    logo_html = '<div style="width: 75px; color:red;">Logo Kosong</div>'
 
 # 2. PANEL INPUT SIDEBAR
 with st.sidebar:
@@ -49,7 +51,7 @@ with st.sidebar:
         daftar_pegawai = []
         for i in range(st.session_state.jumlah_pegawai):
             st.markdown(f"**Pegawai {i+1}**")
-            p_nama = st.text_input(f"Nama P-{i+1}", f"Pegawai {i+1}", key=f"n{i}")
+            p_nama = st.text_input(f"Nama P-{i+1}", f"Nama Pegawai {i+1}", key=f"n{i}")
             p_nip = st.text_input(f"NIP P-{i+1}", "19XXXXXXXXXXXXXX", key=f"nip{i}")
             p_gol = st.text_input(f"Gol P-{i+1}", "Penata Muda - III/a", key=f"g{i}")
             p_jabatan = st.text_input(f"Jabatan P-{i+1}", "Pelaksana", key=f"j{i}")
@@ -64,14 +66,34 @@ with st.sidebar:
         ttd_nip = st.text_input("NIP Penandatangan", "19710328 199203 1 011")
         ttd_gol = st.text_input("Gol Penandatangan", "Pembina Utama Muda - IV/c")
 
+    st.markdown("---")
     if st.button("🖨️ CETAK SEMUA"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
+
+    # --- FITUR DOWNLOAD EXCEL ---
+    df = pd.DataFrame(daftar_pegawai)
+    df['Nomor SPT'] = no_spt
+    df['Tanggal'] = tgl_p.strftime('%d-%m-%Y')
+    df['Tujuan'] = tujuan
+    df['Maksud'] = maksud
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Register_SPD')
+    processed_data = output.getvalue()
+
+    st.download_button(
+        label="📥 UNDUH REGISTER (EXCEL)",
+        data=processed_data,
+        file_name=f'Register_SPD_{tgl_p.strftime("%d%m%Y")}.xlsx',
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
 # FORMAT TANGGAL
 bulan_list = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
 def tgl_str(d): return f"{d.day} {bulan_list[d.month-1]} {d.year}"
 
-# --- CSS TEMPLATE ---
+# --- CSS & TEMPLATE ---
 style_html = f"""
 <style>
     .wrap {{ background-color: #525659; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 25px; }}
@@ -81,7 +103,7 @@ style_html = f"""
     .tabel-polos {{ width: 100%; border-collapse: collapse; margin-bottom: 10px; }}
     .tabel-polos td {{ border: none; padding: 2px; vertical-align: top; }}
     .tabel-border {{ width: 100%; border-collapse: collapse; border: 1.2px solid black; }}
-    .tabel-border td {{ border: 1.2px solid black; padding: 8px 10px; vertical-align: top; }}
+    .tabel-border td, .tabel-border th {{ border: 1.2px solid black; padding: 8px 10px; vertical-align: top; }}
     .text-center {{ text-align: center; }}
     .text-bold {{ font-weight: bold; }}
     .text-underline {{ text-decoration: underline; }}
@@ -90,7 +112,7 @@ style_html = f"""
 
 content_html = f'<div class="wrap">{style_html}'
 
-# --- HALAMAN 1: SPT (SEMUA PEGAWAI MUNCUL SINI) ---
+# --- HALAMAN 1: SPT ---
 pegawai_spt = ""
 for i, p in enumerate(daftar_pegawai):
     pegawai_spt += f"""
@@ -121,7 +143,7 @@ content_html += f"""
 </div>
 """
 
-# --- HALAMAN 2: SPD DEPAN (LOOPING SEBANYAK PEGAWAI) ---
+# --- HALAMAN 2: SPD DEPAN ---
 for p in daftar_pegawai:
     content_html += f"""
     <div class="kertas">
@@ -154,7 +176,7 @@ for p in daftar_pegawai:
     </div>
     """
 
-# --- HALAMAN 3: SPD BELAKANG (CUKUP SATU SAJA) ---
+# --- HALAMAN 3: SPD BELAKANG ---
 content_html += f"""
 <div class="kertas" style="padding-top: 30mm;">
     <table class="tabel-border">
@@ -165,6 +187,24 @@ content_html += f"""
 </div>
 """
 
+# --- HALAMAN 4: BUKU REGISTER ---
+rows_reg = ""
+for i, p in enumerate(daftar_pegawai):
+    rows_reg += f"<tr><td class='text-center'>{i+1}</td><td>{p['nama']}<br><small>NIP: {p['nip']}</small></td><td class='text-center'>{no_spt}</td><td class='text-center'>{tgl_str(tgl_p)}</td><td>{tujuan}</td><td></td></tr>"
+
+content_html += f"""
+<div class="kertas">
+    <div class="kop-container">{logo_html}<div class="kop-text">
+        <h3 style="margin:0;">PEMERINTAH KABUPATEN NGADA</h3><h2 style="margin:0;">SEKRETARIAT DAERAH</h2>
+        <p style="margin:0;">BAGIAN PEREKONOMIAN DAN SUMBER DAYA ALAM</p>
+    </div></div>
+    <h3 class="text-center text-bold" style="margin-bottom: 20px;">BUKU REGISTER PERJALANAN DINAS</h3>
+    <table class="tabel-border">
+        <thead><tr style="background-color: #f2f2f2;"><th>No</th><th>Nama / NIP</th><th>Nomor SPT/SPD</th><th>Tanggal</th><th>Tujuan</th><th>Tanda Terima</th></tr></thead>
+        <tbody>{rows_reg}</tbody>
+    </table>
+</div>
+"""
+
 content_html += "</div>"
 st.components.v1.html(content_html, height=1200, scrolling=True)
-
