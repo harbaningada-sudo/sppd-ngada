@@ -22,21 +22,17 @@ with st.sidebar:
         kode_no = st.text_input("Kode No", "094/Prokopim")
         maksud = st.text_area("Maksud Perjalanan", "Monitoring dan Pendataan Pemilik Tambang Pasir...")
         tujuan = st.text_input("Tempat Tujuan", "Kecamatan Golewa")
-        alat = st.text_input("Alat Angkut", "Mobil")
 
     with st.expander("👤 PEGAWAI", expanded=True):
         nama = st.text_input("Nama Pegawai", "Silfinus Febri Yanto Rugat, S.E.")
         nip = st.text_input("NIP", "19XXXXXXXXXXXXXX")
         gol = st.text_input("Pangkat/Gol", "Penata Muda - III/a")
         jabatan = st.text_area("Jabatan", "Perencana Ahli Pertama Pada Bagian")
-        tingkat = st.text_input("Tingkat Biaya", "Tingkat C")
 
-    with st.expander("🕒 WAKTU & ANGGARAN", expanded=False):
+    with st.expander("🕒 WAKTU", expanded=False):
         tgl_p = st.date_input("Tanggal Berangkat", datetime(2026, 2, 25))
         tgl_k = st.date_input("Tanggal Kembali", datetime(2026, 2, 26))
         lama = st.text_input("Lama Hari", "2 (Dua)")
-        instansi = st.text_input("Instansi Anggaran", "Bagian Perekonomian dan SDA")
-        mata_anggaran = st.text_input("Mata Anggaran", "")
 
     with st.expander("🖋️ PENANDATANGAN", expanded=False):
         tgl_cetak = st.date_input("Tanggal Cetak", datetime(2026, 2, 25))
@@ -59,8 +55,8 @@ surat_html = f"""
     .kop {{ text-align: center; border-bottom: 3px solid black; padding-bottom: 2px; margin-bottom: 15px; line-height: 1.2; }}
     .tabel-polos {{ width: 100%; border-collapse: collapse; }}
     .tabel-polos td {{ border: none; padding: 2px; vertical-align: top; }}
-    .tabel-border {{ width: 100%; border-collapse: collapse; border: 1px solid black; }}
-    .tabel-border td {{ border: 1px solid black; padding: 8px 10px; vertical-align: top; }}
+    .tabel-border {{ width: 100%; border-collapse: collapse; border: 1.2px solid black; }}
+    .tabel-border td {{ border: 1.2px solid black; padding: 12px 10px; vertical-align: top; }}
     .text-center {{ text-align: center; }}
     .text-bold {{ font-weight: bold; }}
     .text-underline {{ text-decoration: underline; }}
@@ -69,10 +65,10 @@ surat_html = f"""
 <div class="wrap">
     <div class="kertas">
         <div class="kop">
-            <h3 style="margin:0;">PEMERINTAH KABUPATEN NGADA</h3>
-            <h2 style="margin:0;">SEKRETARIAT DAERAH</h2>
-            <p style="margin:0;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
-            <h3 style="margin:0;">BAJAWA</h3>
+            <h3 style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
+            <h2 style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h2>
+            <p style="margin:0; font-size: 10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
+            <h3 style="margin:0; font-size: 14pt;">BAJAWA</h3>
         </div>
         <h3 class="text-center text-bold text-underline">SURAT PERINTAH TUGAS</h3>
         <p class="text-center" style="margin-top:-10px;">NOMOR : {no_spt}</p>
@@ -104,10 +100,10 @@ surat_html = f"""
 
     <div class="kertas">
         <div class="kop">
-            <h3 style="margin:0;">PEMERINTAH KABUPATEN NGADA</h3>
-            <h2 style="margin:0;">SEKRETARIAT DAERAH</h2>
-            <p style="margin:0;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
-            <h3 style="margin:0;">BAJAWA</h3>
+            <h3 style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
+            <h2 style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h2>
+            <p style="margin:0; font-size: 10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
+            <h3 style="margin:0; font-size: 14pt;">BAJAWA</h3>
         </div>
         <div style="margin-left: 60%;">
             <table class="tabel-polos" style="font-size: 9pt;">
@@ -116,19 +112,19 @@ surat_html = f"""
                 <tr><td>Nomor</td><td>:</td><td>{no_spd}</td></tr>
             </table>
         </div>
-        <h3 class="text-center text-bold text-underline" style="margin-top:10px; margin-bottom:0;">SURAT PERALANAN DINAS</h3>
+        <h3 class="text-center text-bold text-underline" style="margin-top:10px; margin-bottom:0;">SURAT PERJALANAN DINAS</h3>
         <p class="text-center text-bold" style="margin-top:0;">(SPD)</p>
         <table class="tabel-border">
             <tr><td width="5%">1.</td><td width="40%">Pejabat yang memberi perintah</td><td>BUPATI NGADA</td></tr>
             <tr><td>2.</td><td>Nama Pegawai yang diperintahkan</td><td class="text-bold">{nama}</td></tr>
-            <tr><td>3.</td><td>a. Pangkat/Golongan<br>b. Jabatan<br>c. Tingkat Menurut Peraturan</td><td>{gol}<br>{jabatan}<br>{tingkat}</td></tr>
+            <tr><td>3.</td><td>a. Pangkat/Golongan<br>b. Jabatan<br>c. Tingkat Menurut Peraturan</td><td>{gol}<br>{jabatan}<br>Tingkat C</td></tr>
             <tr><td>4.</td><td>Maksud Perjalanan Dinas</td><td>{maksud}</td></tr>
-            <tr><td>5.</td><td>Alat angkut yang digunakan</td><td>{alat}</td></tr>
+            <tr><td>5.</td><td>Alat angkut yang digunakan</td><td>Pesawat Udara / Kendaraan Dinas</td></tr>
             <tr><td>6.</td><td>a. Tempat Berangkat<br>b. Tempat Tujuan</td><td>Bajawa<br>{tujuan}</td></tr>
             <tr><td>7.</td><td>a. Lamanya Perjalanan Dinas<br>b. Tanggal Berangkat<br>c. Tanggal Harus Kembali</td><td>{lama} Hari<br>{tgl_str(tgl_p)}<br>{tgl_str(tgl_k)}</td></tr>
             <tr><td>8.</td><td>Pengikut: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nama</td><td class="text-center">Tanggal Lahir / Keterangan</td></tr>
             <tr><td height="25px"></td><td>1.</td><td></td></tr>
-            <tr><td>9.</td><td>Pembebanan Anggaran<br>a. Instansi<br>b. Mata Anggaran</td><td><br>a. {instansi}<br>b. {mata_anggaran}</td></tr>
+            <tr><td>9.</td><td>Pembebanan Anggaran<br>a. Instansi<br>b. Mata Anggaran</td><td><br>a. Bagian Perekonomian dan SDA<br>b. </td></tr>
             <tr><td>10.</td><td>Keterangan lain-lain</td><td></td></tr>
         </table>
         <div style="margin-left:55%; margin-top:20px;">
@@ -145,28 +141,28 @@ surat_html = f"""
 
     <div class="kertas">
         <table class="tabel-border">
-            <tr style="height: 160px;">
+            <tr style="height: 200px;">
                 <td width="45%"></td>
                 <td>I. Berangkat dari : Bajawa<br>Ke : {tujuan}<br>Pada Tanggal : {tgl_str(tgl_p)}<br><br>
-                <div class="text-center">An. Bupati Ngada<br>Pj. Sekretaris Daerah<br><br><br><br>
+                <div class="text-center">An. Bupati Ngada<br>Pj. Sekretaris Daerah<br><br><br><br><br>
                 <span class="text-bold text-underline">{ttd_nama}</span><br>{ttd_gol}<br>NIP. {ttd_nip}</div></td>
             </tr>
-            <tr style="height: 140px;">
+            <tr style="height: 160px;">
                 <td>II. Tiba di : {tujuan}<br>Pada Tanggal : {tgl_str(tgl_p)}</td>
                 <td>Berangkat dari : {tujuan}<br>Ke : Bajawa<br>Pada Tanggal : {tgl_str(tgl_k)}</td>
             </tr>
-            <tr style="height: 140px;">
+            <tr style="height: 160px;">
                 <td>III. Tiba di :<br>Pada Tanggal :</td>
                 <td>Berangkat dari :<br>Ke :<br>Pada Tanggal :</td>
             </tr>
-            <tr style="height: 140px;">
+            <tr style="height: 160px;">
                 <td>IV. Tiba di :<br>Pada Tanggal :</td>
                 <td>Berangkat dari :<br>Ke :<br>Pada Tanggal :</td>
             </tr>
-            <tr style="height: 160px;">
+            <tr style="height: 200px;">
                 <td>V. Tiba Kembali : Bajawa<br>Pada Tanggal : {tgl_str(tgl_k)}</td>
                 <td><div style="font-style: italic; text-align: center; font-size: 8.5pt; margin-bottom: 15px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</div>
-                <div class="text-center">An. Bupati Ngada<br>Pj. Sekretaris Daerah<br><br><br><br>
+                <div class="text-center">An. Bupati Ngada<br>Pj. Sekretaris Daerah<br><br><br><br><br>
                 <span class="text-bold text-underline">{ttd_nama}</span><br>{ttd_gol}<br>NIP. {ttd_nip}</div></td>
             </tr>
             <tr><td colspan="2">VI. Catatan Lain-lain</td></tr>
@@ -177,4 +173,4 @@ surat_html = f"""
 </div>
 """
 
-st.components.v1.html(surat_html, height=3800, scrolling=True)
+st.components.v1.html(surat_html, height=4200, scrolling=True)
