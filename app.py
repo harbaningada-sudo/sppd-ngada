@@ -1,7 +1,5 @@
 import streamlit as st
 from datetime import datetime
-import base64
-import os
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
@@ -14,25 +12,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# FUNGSI BARU: MENGAMBIL LOGO DENGAN CARA YANG LEBIH STABIL
-def get_base64_logo():
-    # Daftar kemungkinan nama file yang mungkin kamu upload
-    possible_names = ["logo_ngada.jpg", "logo_ngada.JPG", "Logo_ngada.jpg"]
-    
-    for name in possible_names:
-        if os.path.exists(name):
-            with open(name, "rb") as f:
-                data = base64.b64encode(f.read()).decode()
-                return f"data:image/jpeg;base64,{data}"
-    return None
-
-logo_data_url = get_base64_logo()
+# MASUKKAN KODE HASIL CONVERT TADI DI SINI
+# Saya beri contoh teks, nanti kamu ganti dengan kode dari website base64-image.de
+logo_data_url = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ..." # <--- GANTI INI (PASTE KODE PANJANGNYA)
 
 if logo_data_url:
     logo_html = f'<img src="{logo_data_url}" class="logo-img">'
 else:
-    # Placeholder jika tetap tidak ketemu agar teks tidak bergeser berantakan
-    logo_html = '<div style="width: 75px;"></div>'
+    logo_html = '<div style="width: 80px;"></div>'
 
 # 2. PANEL INPUT SIDEBAR
 with st.sidebar:
@@ -159,7 +146,7 @@ surat_html = f"""
             </table>
         </div>
         <h3 class="text-center text-bold text-underline" style="margin-top:10px; margin-bottom:0;">SURAT PERINTAH DINAS</h3>
-        <p class="text-center" style="margin-top:0;">(SPD)</p>
+        <p class="text-center text-bold" style="margin-top:0;">(SPD)</p>
         <table class="tabel-border">
             <tr><td width="5%">1.</td><td width="40%">Pejabat yang memberi perintah</td><td>BUPATI NGADA</td></tr>
             <tr><td>2.</td><td>Nama Pegawai yang diperintahkan</td><td class="text-bold">{nama}</td></tr>
