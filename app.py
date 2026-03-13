@@ -12,12 +12,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN LOGO (TEMPEL KODE PANJANG DI ANTARA KUTIP TIGA) ---
+# --- BAGIAN LOGO (TEMPEL KODE PANJANGMU DI ANTARA KUTIP TIGA) ---
+# Gunakan kutip tiga agar kode Base64 yang sangat panjang tidak dianggap error oleh Python
 logo_data_url = """PASTE_KODE_BASE64_MU_DI_SINI""" 
 
 if len(logo_data_url) > 100:
     logo_html = f'<img src="{logo_data_url}" class="logo-img">'
 else:
+    # Jika kode logo belum ditempel, biarkan kosong agar tidak error
     logo_html = '<div style="width: 80px;"></div>'
 
 # 2. PANEL INPUT SIDEBAR
@@ -61,6 +63,7 @@ surat_html = f"""
     .wrap {{ background-color: #525659; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 25px; }}
     .kertas {{ background-color: white; width: 210mm; min-height: 297mm; padding: 15mm 20mm 20mm 25mm; color: black; font-family: Arial, sans-serif; font-size: 10pt; box-shadow: 0 0 15px rgba(0,0,0,0.5); box-sizing: border-box; page-break-after: always; }}
     
+    /* Kop dengan Logo (SPT & SPD Depan) */
     .kop-container {{
         display: flex;
         align-items: center;
@@ -69,7 +72,7 @@ surat_html = f"""
         margin-bottom: 15px;
     }}
     .logo-img {{
-        width: 80px;
+        width: 75px; /* Ukuran logo disesuaikan */
         height: auto;
         margin-right: 20px;
     }}
@@ -145,7 +148,7 @@ surat_html = f"""
             </table>
         </div>
         <h3 class="text-center text-bold text-underline" style="margin-top:10px; margin-bottom:0;">SURAT PERINTAH DINAS</h3>
-        <p class="text-center text-bold" style="margin-top:0;">(SPD)</p>
+        <p class="text-center" style="margin-top:0;">(SPD)</p>
         <table class="tabel-border">
             <tr><td width="5%">1.</td><td width="40%">Pejabat yang memberi perintah</td><td>BUPATI NGADA</td></tr>
             <tr><td>2.</td><td>Nama Pegawai yang diperintahkan</td><td class="text-bold">{nama}</td></tr>
