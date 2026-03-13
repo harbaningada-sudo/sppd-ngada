@@ -4,19 +4,20 @@ from datetime import datetime
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Cetak SPT Prokopim Ngada", layout="wide")
 
-# CSS SAKTI UNTUK MENGHAPUS JARAK KOSONG DI ATAS
+# CSS AGRESIF UNTUK MENGHAPUS JARAK ATAS
 st.markdown("""
 <style>
-    /* Menghilangkan Header, Footer, dan padding bawaan Streamlit */
+    /* Menghilangkan elemen UI bawaan */
     header, footer, #MainMenu {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    /* MENGHILANGKAN JARAK PUTIH DI ATAS (Sangat Penting) */
+    /* MEMAKSA HALAMAN MEPET KE ATAS (0 PIXEL) */
+    .stApp {
+        margin-top: -60px !important;
+    }
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
     }
     
     .main { background-color: #525659; }
@@ -26,7 +27,7 @@ st.markdown("""
         width: 210mm;
         min-height: 297mm;
         padding: 10mm 20mm 20mm 25mm;
-        margin: 0 auto !important; /* Kertas langsung mepet ke atas */
+        margin: 0 auto !important;
         color: black;
         font-family: "Arial", sans-serif;
         font-size: 11pt;
@@ -52,6 +53,7 @@ st.markdown("""
 
     @media print {
         .stSidebar, .stButton { display: none !important; }
+        .stApp { margin-top: 0 !important; }
         .main { background-color: white !important; }
         .kertas-a4 { box-shadow: none !important; margin: 0 !important; }
     }
