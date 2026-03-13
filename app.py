@@ -4,19 +4,29 @@ from datetime import datetime
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Cetak SPT Prokopim Ngada", layout="wide")
 
-# CSS UNTUK KERTAS & KOP MEPET
+# CSS SAKTI UNTUK MENGHAPUS JARAK KOSONG DI ATAS
 st.markdown("""
 <style>
+    /* Menghilangkan Header, Footer, dan padding bawaan Streamlit */
     header, footer, #MainMenu {visibility: hidden;}
     .stDeployButton {display:none;}
-    .main { background-color: #525659; padding-top: 0rem; }
+    
+    /* MENGHILANGKAN JARAK PUTIH DI ATAS (Sangat Penting) */
+    .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 0rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    .main { background-color: #525659; }
     
     .kertas-a4 {
         background-color: white;
         width: 210mm;
         min-height: 297mm;
         padding: 10mm 20mm 20mm 25mm;
-        margin: 0 auto; /* Menghilangkan margin atas di tampilan web */
+        margin: 0 auto !important; /* Kertas langsung mepet ke atas */
         color: black;
         font-family: "Arial", sans-serif;
         font-size: 11pt;
@@ -24,13 +34,13 @@ st.markdown("""
         box-sizing: border-box;
     }
 
-    /* KOP SURAT MEPET (Line Spacing Kecil) */
+    /* KOP SURAT MEPET */
     .kop-header { 
         text-align: center; 
         border-bottom: 3px solid black; 
         padding-bottom: 2px; 
         margin-bottom: 15px;
-        line-height: 1.1; /* Membuat antar baris lebih rapat */
+        line-height: 1.1;
     }
     
     .tabel-data { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
