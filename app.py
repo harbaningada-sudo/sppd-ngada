@@ -2,7 +2,7 @@ import streamlit as st
 from datetime import datetime
 
 # 1. KONFIGURASI HALAMAN
-st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
+st.set_page_config(page_title="Cetak SPT Prokopim Ngada", layout="wide")
 
 st.markdown("""
 <style>
@@ -10,54 +10,44 @@ st.markdown("""
     .stDeployButton {display:none;}
     .main { background-color: #525659; }
 
-    /* KERTAS A4 */
     .kertas-a4 {
         background-color: white;
         width: 210mm;
         min-height: 297mm;
-        padding: 10mm 15mm;
-        margin: 15px auto;
+        padding: 10mm 20mm 20mm 25mm;
+        margin: 10px auto;
         color: black;
         font-family: "Arial", sans-serif;
-        font-size: 10.5pt;
-        box-shadow: 0 0 15px rgba(0,0,0,0.4);
+        font-size: 11pt;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
         box-sizing: border-box;
     }
 
-    /* AREA KOP SURAT (Kosong untuk Space Logo) */
-    .kop-surat {
-        height: 3.5cm;
+    /* KOP SURAT MANUAL (Agar presisi jika tidak pakai kertas berkop) */
+    .kop-header {
         text-align: center;
-        margin-bottom: 10px;
+        border-bottom: 3px solid black;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
     }
+    .kop-header h2, .kop-header h3 { margin: 0; padding: 0; }
 
-    /* TABEL STYLE */
-    .tabel-excel {
+    /* TABEL DATA TRANSAPARAN */
+    .tabel-data {
         width: 100%;
         border-collapse: collapse;
-        table-layout: fixed;
+        margin-bottom: 10px;
     }
-    .tabel-excel td {
-        border: 1px solid black;
-        padding: 6px 10px;
+    .tabel-data td {
+        border: none !important;
+        padding: 2px 0;
         vertical-align: top;
-        line-height: 1.3;
     }
-    
-    .no-border td { border: none !important; padding: 2px !important; }
+
     .text-center { text-align: center; }
     .text-bold { font-weight: bold; }
     .text-underline { text-decoration: underline; }
-
-    /* SPD BELAKANG */
-    .col-kiri { width: 44%; }
-    .col-kanan { width: 56%; }
-
-    @media print {
-        .stSidebar, .stButton, .no-print { display: none !important; }
-        @page { size: A4; margin: 0; }
-        .kertas-a4 { margin: 0 !important; box-shadow: none !important; border: none !important; page-break-after: always; }
-    }
+    .text-justify { text-align: justify; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -65,94 +55,109 @@ def format_indo(tgl):
     bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
     return f"{tgl.day} {bulan[tgl.month-1]} {tgl.year}"
 
-# 2. OPSI INPUTAN SIDEBAR
+# 2. PANEL INPUT SIDEBAR
 with st.sidebar:
-    st.header("⚙️ PANEL INPUT")
+    st.header("📋 INPUT DATA SPT")
+    no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
+    dasar = st.text_area("Dasar (DPA)", "DPA Bagian Perekonomian dan SDA Setda Ngada Tahun Anggaran 2026")
     
-    with st.expander("📄 DATA SURAT", expanded=True):
-        no_spt = st.text_input("Nomor SPT", "094/PROKOPIM/388/02/2026")
-        no_spd = st.text_input("Nomor SPD", "094/PROKOPIM/388/02/2026")
-        maksud = st.text_area("Maksud Tugas", "Melakukan koordinasi dan konsultasi...")
-        tujuan = st.text_input("Tujuan", "Kupang")
-        alat = st.text_input("Alat Angkut", "Pesawat Udara / Kendaraan Dinas")
-
-    with st.expander("🕒 WAKTU & ANGGARAN", expanded=False):
-        tgl_p = st.date_input("Berangkat", datetime(2026, 2, 9))
-        tgl_k = st.date_input("Kembali", datetime(2026, 2, 11))
-        lama = st.text_input("Lama Hari", "3 (Tiga)")
-        dpa = st.text_input("Instansi", "Sekretariat Daerah Kabupaten Ngada")
-        mata_anggaran = st.text_input("Mata Anggaran", "5.1.02.04.01.0001")
-
-    with st.expander("👥 PEJABAT & PEGAWAI", expanded=True):
-        pemberi = st.text_input("Pemberi Perintah", "Bupati Ngada")
-        nama_ttd = st.text_input("Penandatangan", "ANDREAS PARU")
-        st.info("Nama | NIP | Jabatan | Gol")
-        peg_txt = st.text_area("Daftar Pegawai", "RAYMUNDUS BENA, S.S., M.Hum | 19XXXXXXXXXXXXXX | Wakil Bupati Ngada | IV/c")
-
-    daftar = []
-    for line in peg_txt.split('\n'):
-        if '|' in line:
-            p = line.split('|')
-            daftar.append({"nama": p[0].strip(), "nip": p[1].strip(), "jab": p[2].strip(), "gol": p[3].strip()})
-
     st.markdown("---")
-    if st.button("🖨️ CETAK SEKARANG"):
+    st.subheader("👤 Data Pegawai")
+    nama = st.text_input("Nama Pegawai", "Dr. Nicolaus Noywuli, S.Pt., M.Si")
+    nip = st.text_input("NIP", "19720921 200012 1 004")
+    gol = st.text_input("Pangkat/Gol", "Pembina Utama Muda - IV/c")
+    jabatan = st.text_area("Jabatan", "Asisten Perekonomian dan Pembangunan Setda Ngada")
+    
+    st.markdown("---")
+    untuk = st.text_area("Untuk (Kegiatan)", "Dalam Rangka Mendampingi Kunjungan Kementerian Pemberdayaan Perempuan dan Perlindungan Anak (PPPA) di Desa Naruwolo Kec. Jerebuu")
+    
+    st.markdown("---")
+    tgl_tetap = st.date_input("Tanggal Penetapan", datetime(2026, 2, 12))
+    nama_sekda = st.text_input("Nama Pj. Sekda", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
+    nip_sekda = st.text_input("NIP Pj. Sekda", "19710328 199203 1 011")
+
+    if st.button("🖨️ PRINT SPT"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
-# 3. RENDER DOKUMEN
-if daftar:
-    # --- 1. SPT (TANPA MENIMBANG) ---
-    st.markdown(f"""<div class="kertas-a4">
-        <div class="kop-surat"></div>
-        <h3 align="center" class="text-underline">SURAT PERINTAH TUGAS</h3>
-        <p align="center" style="margin-top:-10px;">Nomor: {no_spt}</p><br>
-        <table class="tabel-excel no-border">
-            <tr><td width="15%">Dasar</td><td width="2%">:</td><td>DPA Satuan Kerja Perangkat Daerah Sekretariat Daerah Kabupaten Ngada Tahun Anggaran 2026.</td></tr>
-        </table>
-        <p align="center" class="text-bold" style="margin:25px 0;">MEMERINTAHKAN:</p>
-        <table class="tabel-excel">
-            <tr align="center" style="background:#f2f2f2; font-weight:bold;">
-                <td width="8%">No</td><td>Nama / NIP</td><td>Pangkat / Gol</td><td>Jabatan</td>
-            </tr>
-            {"".join([f"<tr><td align='center'>{i+1}</td><td>{p['nama']}<br>NIP. {p['nip']}</td><td align='center'>{p['gol']}</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])}
-        </table>
-        <p style="margin-top:20px;">Untuk: {maksud} ke {tujuan} selama {lama} hari kerja terhitung mulai tanggal {format_indo(tgl_p)} s/d {format_indo(tgl_k)}.</p>
-        <div style="margin-left:55%; margin-top:50px; text-align:center;">
-            <p>Dikeluarkan di: Bajawa</p>
-            <p>Pada Tanggal: {format_indo(datetime.now())}</p>
-            <b>{pemberi.upper()}</b><br><br><br><br><b>{nama_ttd}</b>
-        </div>
-    </div>""", unsafe_allow_html=True)
+# 3. RENDER SPT
+st.markdown(f"""
+<div class="kertas-a4">
+    <div class="kop-header">
+        <h3>PEMERINTAH KABUPATEN NGADA</h3>
+        <h3>SEKRETARIAT DAERAH</h3>
+        <p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 21012</p>
+        <h3 class="text-bold">BAJAWA</h3>
+    </div>
 
-    for p in daftar:
-        # --- 2. SPD DEPAN ---
-        st.markdown(f"""<div class="kertas-a4">
-            <div class="kop-surat"></div>
-            <h3 align="center" style="margin-bottom:20px;">SURAT PERJALANAN DINAS (SPD)</h3>
-            <table class="tabel-excel">
-                <tr><td width="5%">1.</td><td width="45%">Pejabat Pemberi Perintah</td><td>{pemberi}</td></tr>
-                <tr><td>2.</td><td>Nama Pegawai diperintah</td><td><b>{p['nama']}</b></td></tr>
-                <tr><td>3.</td><td>a. Pangkat dan Golongan<br>b. Jabatan / Instansi<br>c. Tingkat Biaya Perjalanan</td><td>{p['gol']}<br>{p['jab']}<br>Tingkat A</td></tr>
-                <tr><td>4.</td><td>Maksud Perjalanan Dinas</td><td>{maksud}</td></tr>
-                <tr><td>5.</td><td>Alat Angkut dipergunakan</td><td>{alat}</td></tr>
-                <tr><td>6.</td><td>a. Tempat Berangkat<br>b. Tempat Tujuan</td><td>Bajawa<br>{tujuan}</td></tr>
-                <tr><td>7.</td><td>a. Lamanya Perjalanan Dinas<br>b. Tanggal Berangkat<br>c. Tanggal harus kembali</td><td>{lama} Hari<br>{format_indo(tgl_p)}<br>{format_indo(tgl_k)}</td></tr>
-                <tr><td>8.</td><td>Pengikut : Nama</td><td>NIP / Keterangan</td></tr>
-                <tr><td height="40px"></td><td></td><td></td></tr>
-                <tr><td>9.</td><td>Pembebanan Anggaran<br>a. Instansi<br>b. Mata Anggaran</td><td><br>{dpa}<br>{mata_anggaran}</td></tr>
-            </table>
-            <div style="margin-left:55%; margin-top:35px; text-align:center;">
-                <p>Ditetapkan di: Bajawa</p>
-                <b>{pemberi.upper()}</b><br><br><br><br><b>{nama_ttd}</b>
-            </div>
-        </div>""", unsafe_allow_html=True)
+    <h3 class="text-center text-bold text-underline" style="margin-bottom:0;">SURAT PERINTAH TUGAS</h3>
+    <p class="text-center" style="margin-top:0;">NOMOR : {no_spt}</p>
+    
+    <br>
+    
+    <table class="tabel-data">
+        <tr>
+            <td width="15%">Dasar</td>
+            <td width="2%">:</td>
+            <td class="text-justify">{dasar}</td>
+        </tr>
+    </table>
 
-        # --- 3. SPD BELAKANG ---
-        st.markdown(f"""<div class="kertas-a4">
-            <table class="tabel-excel">
-                <tr style="height:6.5cm;"><td class="col-kiri"></td><td class="col-kanan">I. Berangkat dari: Bajawa<br>Ke: {tujuan}<br>Tanggal: {format_indo(tgl_p)}<div align="center"><br><b>{pemberi.upper()}</b><br><br><br><br><b>{nama_ttd}</b></div></td></tr>
-                <tr style="height:5.5cm;"><td>II. Tiba di: {tujuan}<br>Tanggal: {format_indo(tgl_p)}</td><td>Berangkat dari: {tujuan}<br>Ke: Bajawa<br>Tanggal: {format_indo(tgl_k)}</td></tr>
-                <tr style="height:5.5cm;"><td>III. Tiba di:</td><td>Berangkat dari:</td></tr>
-                <tr style="height:6.5cm;"><td>V. Tiba Kembali: Bajawa<br>Tanggal: {format_indo(tgl_k)}</td><td><div align="center" style="font-style:italic; font-size:9pt;">Telah diperiksa dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan.</div><div align="center" style="margin-top:20px;"><b>{pemberi.upper()}</b><br><br><br><br><b>....................</b></div></td></tr>
-            </table>
-        </div>""", unsafe_allow_html=True)
+    <p class="text-center" style="letter-spacing: 3px; margin: 20px 0;">M E M E R I N T A H K A N</p>
+
+    <table class="tabel-data">
+        <tr>
+            <td width="15%">Kepada</td>
+            <td width="5%">: 1.</td>
+            <td width="15%">Nama</td>
+            <td width="2%">:</td>
+            <td class="text-bold">{nama}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>Pangkat/Gol</td>
+            <td>:</td>
+            <td>{gol}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>NIP</td>
+            <td>:</td>
+            <td>{nip}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>Jabatan</td>
+            <td>:</td>
+            <td>{jabatan}</td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table class="tabel-data">
+        <tr>
+            <td width="15%">Untuk</td>
+            <td width="2%">:</td>
+            <td class="text-justify">{untuk}</td>
+        </tr>
+    </table>
+
+    <div style="margin-left:55%; margin-top:40px;">
+        <table class="tabel-data">
+            <tr><td width="40%">Ditetapkan di</td><td>:</td><td>Bajawa</td></tr>
+            <tr><td>Pada Tanggal</td><td>:</td><td>{format_indo(tgl_tetap)}</td></tr>
+        </table>
+        
+        <p style="margin: 20px 0 0 25px;">
+            <span class="text-bold">An. BUPATI NGADA</span><br>
+            Pj. Sekretaris Daerah,<br><br><br><br>
+            <span class="text-bold text-underline">{nama_sekda}</span><br>
+            {gol}<br>
+            NIP. {nip_sekda}
+        </p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
