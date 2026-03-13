@@ -23,7 +23,6 @@ st.markdown("""
         box-sizing: border-box;
     }
 
-    /* KOP SURAT MANUAL (Agar presisi jika tidak pakai kertas berkop) */
     .kop-header {
         text-align: center;
         border-bottom: 3px solid black;
@@ -32,7 +31,6 @@ st.markdown("""
     }
     .kop-header h2, .kop-header h3 { margin: 0; padding: 0; }
 
-    /* TABEL DATA TRANSAPARAN */
     .tabel-data {
         width: 100%;
         border-collapse: collapse;
@@ -79,12 +77,12 @@ with st.sidebar:
     if st.button("🖨️ PRINT SPT"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
-# 3. RENDER SPT
-st.markdown(f"""
+# 3. RENDER SPT (PAKAI st.markdown DENGAN unsafe_allow_html=True)
+spt_html = f"""
 <div class="kertas-a4">
     <div class="kop-header">
-        <h3>PEMERINTAH KABUPATEN NGADA</h3>
-        <h3>SEKRETARIAT DAERAH</h3>
+        <h3 class="text-bold">PEMERINTAH KABUPATEN NGADA</h3>
+        <h3 class="text-bold">SEKRETARIAT DAERAH</h3>
         <p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 21012</p>
         <h3 class="text-bold">BAJAWA</h3>
     </div>
@@ -113,22 +111,19 @@ st.markdown(f"""
             <td class="text-bold">{nama}</td>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
+            <td></td><td></td>
             <td>Pangkat/Gol</td>
             <td>:</td>
             <td>{gol}</td>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
+            <td></td><td></td>
             <td>NIP</td>
             <td>:</td>
             <td>{nip}</td>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
+            <td></td><td></td>
             <td>Jabatan</td>
             <td>:</td>
             <td>{jabatan}</td>
@@ -151,13 +146,17 @@ st.markdown(f"""
             <tr><td>Pada Tanggal</td><td>:</td><td>{format_indo(tgl_tetap)}</td></tr>
         </table>
         
-        <p style="margin: 20px 0 0 25px;">
-            <span class="text-bold">An. BUPATI NGADA</span><br>
-            Pj. Sekretaris Daerah,<br><br><br><br>
-            <span class="text-bold text-underline">{nama_sekda}</span><br>
-            {gol}<br>
-            NIP. {nip_sekda}
-        </p>
+        <div style="margin: 20px 0 0 25px;">
+            <p class="text-bold" style="margin:0;">An. BUPATI NGADA</p>
+            <p style="margin:0;">Pj. Sekretaris Daerah,</p>
+            <br><br><br><br>
+            <p class="text-bold text-underline" style="margin:0;">{nama_sekda}</p>
+            <p style="margin:0;">{gol}</p>
+            <p style="margin:0;">NIP. {nip_sekda}</p>
+        </div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+"""
+
+# INI BAGIAN PENTINGNYA, BRO!
+st.markdown(spt_html, unsafe_allow_html=True)
