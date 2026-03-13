@@ -23,8 +23,8 @@ def get_image_as_base64(path):
         return None
 
 # TENTUKAN PATH KE LOGO ANDA
-# Pastikan file Logo.jpg ada di folder yang sama dengan app.py
-logo_path = Path("Logo.jpg")
+# Pastikan file logo_ngada.jpg ada di folder yang sama dengan app.py
+logo_path = Path("logo_ngada.jpg")
 
 # CEK APAKAH LOGO ADA, JIKA ADA UBAH KE BASE64
 logo_base64 = get_image_as_base64(logo_path)
