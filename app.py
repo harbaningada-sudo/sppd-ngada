@@ -14,9 +14,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# FUNGSI UNTUK MENGUBAH GAMBAR LOKAL (GITHUB) MENJADI BASE64
+# FUNGSI UNTUK MENGUBAH GAMBAR MENJADI BASE64
 def get_image_as_base64(path):
     try:
+        # Mencoba membaca file logo_ngada.jpg
         if path.exists():
             with open(path, "rb") as image_file:
                 return base64.b64encode(image_file.read()).decode()
@@ -24,15 +25,14 @@ def get_image_as_base64(path):
     except Exception:
         return None
 
-# TENTUKAN PATH KE LOGO (Pastikan nama file di GitHub: logo_ngada.jpg)
+# MENCARI LOGO (Pastikan file di GitHub namanya logo_ngada.jpg)
 logo_path = Path("logo_ngada.jpg")
 logo_base64 = get_image_as_base64(logo_path)
 
 if logo_base64:
-    # Ukuran logo diatur di width: 75px agar tidak menutupi tulisan
     logo_html = f'<img src="data:image/jpeg;base64,{logo_base64}" class="logo-img">'
 else:
-    # Placeholder jika logo tidak terbaca
+    # Jika logo belum terbaca, buat kotak kosong agar teks kop tetap di tengah
     logo_html = '<div style="width: 75px;"></div>'
 
 # 2. PANEL INPUT SIDEBAR
@@ -76,7 +76,6 @@ surat_html = f"""
     .wrap {{ background-color: #525659; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 25px; }}
     .kertas {{ background-color: white; width: 210mm; min-height: 297mm; padding: 15mm 20mm 20mm 25mm; color: black; font-family: Arial, sans-serif; font-size: 10pt; box-shadow: 0 0 15px rgba(0,0,0,0.5); box-sizing: border-box; page-break-after: always; }}
     
-    /* Kop dengan Logo (SPT & SPD Depan) */
     .kop-container {{
         display: flex;
         align-items: center;
@@ -92,15 +91,6 @@ surat_html = f"""
     .kop-text {{
         flex: 1;
         text-align: center;
-        line-height: 1.2;
-    }}
-    
-    /* Kop Tanpa Logo (SPD Belakang) */
-    .kop-polos {{
-        text-align: center;
-        border-bottom: 3px solid black;
-        padding-bottom: 5px;
-        margin-bottom: 15px;
         line-height: 1.2;
     }}
     
@@ -196,13 +186,7 @@ surat_html = f"""
         </div>
     </div>
 
-    <div class="kertas">
-        <div class="kop-polos">
-            <h3 style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
-            <h2 style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h2>
-            <p style="margin:0; font-size: 10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
-            <h3 style="margin:0; font-size: 14pt;">BAJAWA</h3>
-        </div>
+    <div class="kertas" style="padding-top: 25mm;">
         <table class="tabel-border">
             <tr style="height: 200px;">
                 <td width="45%"></td>
