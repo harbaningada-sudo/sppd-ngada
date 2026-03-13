@@ -4,38 +4,48 @@ from datetime import datetime
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Cetak SPT Prokopim Ngada", layout="wide")
 
-# CSS AGRESIF UNTUK MENGHAPUS JARAK ATAS
+# CSS EKSTREM UNTUK MENGHILANGKAN HALAMAN KOSONG
 st.markdown("""
 <style>
-    /* Menghilangkan elemen UI bawaan */
-    header, footer, #MainMenu {visibility: hidden;}
-    .stDeployButton {display:none;}
+    /* Sembunyikan semua elemen UI Streamlit */
+    header, footer, #MainMenu {visibility: hidden !important;}
+    .stDeployButton {display:none !important;}
     
-    /* MEMAKSA HALAMAN MEPET KE ATAS (0 PIXEL) */
+    /* Menghilangkan semua padding dan margin pada aplikasi */
     .stApp {
-        margin-top: -60px !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     .block-container {
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .main { 
+        background-color: #525659; 
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding-top: 0 !important;
     }
     
-    .main { background-color: #525659; }
-    
+    /* MEMAKSA KERTAS MEPET KE ATAS LAYAR */
     .kertas-a4 {
         background-color: white;
         width: 210mm;
         min-height: 297mm;
         padding: 10mm 20mm 20mm 25mm;
-        margin: 0 auto !important;
+        margin-top: 0 !important; /* Paksa 0 pixel dari atas */
+        margin-bottom: 20px;
         color: black;
         font-family: "Arial", sans-serif;
         font-size: 11pt;
         box-shadow: 0 0 15px rgba(0,0,0,0.5);
         box-sizing: border-box;
+        position: relative;
     }
 
-    /* KOP SURAT MEPET */
+    /* KOP SURAT MEPET BARIS */
     .kop-header { 
         text-align: center; 
         border-bottom: 3px solid black; 
@@ -53,9 +63,12 @@ st.markdown("""
 
     @media print {
         .stSidebar, .stButton { display: none !important; }
-        .stApp { margin-top: 0 !important; }
-        .main { background-color: white !important; }
-        .kertas-a4 { box-shadow: none !important; margin: 0 !important; }
+        .stApp { margin: 0 !important; padding: 0 !important; }
+        .kertas-a4 { 
+            box-shadow: none !important; 
+            margin: 0 !important; 
+            padding: 10mm 15mm 15mm 20mm !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
