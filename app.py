@@ -60,7 +60,7 @@ surat_html = f"""
     .tabel-polos {{ width: 100%; border-collapse: collapse; }}
     .tabel-polos td {{ border: none; padding: 2px; vertical-align: top; }}
     .tabel-border {{ width: 100%; border-collapse: collapse; border: 1px solid black; }}
-    .tabel-border td {{ border: 1px solid black; padding: 5px 8px; vertical-align: top; }}
+    .tabel-border td {{ border: 1px solid black; padding: 8px 10px; vertical-align: top; }}
     .text-center {{ text-align: center; }}
     .text-bold {{ font-weight: bold; }}
     .text-underline {{ text-decoration: underline; }}
@@ -116,7 +116,7 @@ surat_html = f"""
                 <tr><td>Nomor</td><td>:</td><td>{no_spd}</td></tr>
             </table>
         </div>
-        <h3 class="text-center text-bold text-underline" style="margin-top:10px; margin-bottom:0;">SURAT PERJALANAN DINAS</h3>
+        <h3 class="text-center text-bold text-underline" style="margin-top:10px; margin-bottom:0;">SURAT PERALANAN DINAS</h3>
         <p class="text-center text-bold" style="margin-top:0;">(SPD)</p>
         <table class="tabel-border">
             <tr><td width="5%">1.</td><td width="40%">Pejabat yang memberi perintah</td><td>BUPATI NGADA</td></tr>
@@ -145,11 +145,30 @@ surat_html = f"""
 
     <div class="kertas">
         <table class="tabel-border">
-            <tr style="height: 120px;"><td width="45%"></td><td>I. Berangkat dari : Bajawa<br>Ke : {tujuan}<br>Pada Tanggal : {tgl_str(tgl_p)}<br><br><div class="text-center">An. Bupati Ngada<br>Pj. Sekretaris Daerah<br><br><br><br><span class="text-bold text-underline">{ttd_nama}</span><br>{ttd_gol}<br>NIP. {ttd_nip}</div></td></tr>
-            <tr style="height: 110px;"><td>II. Tiba di : {tujuan}<br>Pada Tanggal : {tgl_str(tgl_p)}</td><td>Berangkat dari : {tujuan}<br>Ke : Bajawa<br>Pada Tanggal : {tgl_str(tgl_k)}</td></tr>
-            <tr style="height: 110px;"><td>III. Tiba di :<br>Pada Tanggal :</td><td>Berangkat dari :<br>Ke :<br>Pada Tanggal :</td></tr>
-            <tr style="height: 110px;"><td>IV. Tiba di :<br>Pada Tanggal :</td><td>Berangkat dari :<br>Ke :<br>Pada Tanggal :</td></tr>
-            <tr style="height: 120px;"><td>V. Tiba Kembali : Bajawa<br>Pada Tanggal : {tgl_str(tgl_k)}</td><td><div style="font-style: italic; text-align: center; font-size: 8.5pt; margin-bottom: 10px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</div><div class="text-center">An. Bupati Ngada<br>Pj. Sekretaris Daerah<br><br><br><br><span class="text-bold text-underline">{ttd_nama}</span><br>{ttd_gol}<br>NIP. {ttd_nip}</div></td></tr>
+            <tr style="height: 160px;">
+                <td width="45%"></td>
+                <td>I. Berangkat dari : Bajawa<br>Ke : {tujuan}<br>Pada Tanggal : {tgl_str(tgl_p)}<br><br>
+                <div class="text-center">An. Bupati Ngada<br>Pj. Sekretaris Daerah<br><br><br><br>
+                <span class="text-bold text-underline">{ttd_nama}</span><br>{ttd_gol}<br>NIP. {ttd_nip}</div></td>
+            </tr>
+            <tr style="height: 140px;">
+                <td>II. Tiba di : {tujuan}<br>Pada Tanggal : {tgl_str(tgl_p)}</td>
+                <td>Berangkat dari : {tujuan}<br>Ke : Bajawa<br>Pada Tanggal : {tgl_str(tgl_k)}</td>
+            </tr>
+            <tr style="height: 140px;">
+                <td>III. Tiba di :<br>Pada Tanggal :</td>
+                <td>Berangkat dari :<br>Ke :<br>Pada Tanggal :</td>
+            </tr>
+            <tr style="height: 140px;">
+                <td>IV. Tiba di :<br>Pada Tanggal :</td>
+                <td>Berangkat dari :<br>Ke :<br>Pada Tanggal :</td>
+            </tr>
+            <tr style="height: 160px;">
+                <td>V. Tiba Kembali : Bajawa<br>Pada Tanggal : {tgl_str(tgl_k)}</td>
+                <td><div style="font-style: italic; text-align: center; font-size: 8.5pt; margin-bottom: 15px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</div>
+                <div class="text-center">An. Bupati Ngada<br>Pj. Sekretaris Daerah<br><br><br><br>
+                <span class="text-bold text-underline">{ttd_nama}</span><br>{ttd_gol}<br>NIP. {ttd_nip}</div></td>
+            </tr>
             <tr><td colspan="2">VI. Catatan Lain-lain</td></tr>
             <tr><td colspan="2">VII. Perhatian :</td></tr>
             <tr><td colspan="2" style="text-align: justify; font-style: italic; padding: 10px; font-size: 8.5pt;">Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</td></tr>
@@ -158,4 +177,4 @@ surat_html = f"""
 </div>
 """
 
-st.components.v1.html(surat_html, height=3500, scrolling=True)
+st.components.v1.html(surat_html, height=3800, scrolling=True)
