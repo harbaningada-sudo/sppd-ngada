@@ -1,48 +1,28 @@
 import streamlit as st
 from datetime import datetime
 
-# 1. KONFIGURASI HALAMAN
+# 1. KONFIGURASI HALAMAN (KEMBALI KE LAYOUT SEMULA)
 st.set_page_config(page_title="Cetak SPT Prokopim Ngada", layout="wide")
 
-# CSS EKSTREM UNTUK MENGHILANGKAN HALAMAN KOSONG
 st.markdown("""
 <style>
-    /* Sembunyikan semua elemen UI Streamlit */
-    header, footer, #MainMenu {visibility: hidden !important;}
-    .stDeployButton {display:none !important;}
+    header, footer, #MainMenu {visibility: hidden;}
+    .stDeployButton {display:none;}
     
-    /* Menghilangkan semua padding dan margin pada aplikasi */
-    .stApp {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    .block-container {
-        padding: 0 !important;
-        max-width: 100% !important;
-    }
-
-    .main { 
-        background-color: #525659; 
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        padding-top: 0 !important;
-    }
+    /* BACKGROUND ABU-ABU SEPERTI SEBELUMNYA */
+    .main { background-color: #525659; }
     
-    /* MEMAKSA KERTAS MEPET KE ATAS LAYAR */
     .kertas-a4 {
         background-color: white;
         width: 210mm;
         min-height: 297mm;
-        padding: 10mm 20mm 20mm 25mm;
-        margin-top: 0 !important; /* Paksa 0 pixel dari atas */
-        margin-bottom: 20px;
+        padding: 15mm 20mm 20mm 25mm;
+        margin: 20px auto; /* Margin kembali normal agar terlihat proporsional */
         color: black;
         font-family: "Arial", sans-serif;
         font-size: 11pt;
         box-shadow: 0 0 15px rgba(0,0,0,0.5);
         box-sizing: border-box;
-        position: relative;
     }
 
     /* KOP SURAT MEPET BARIS */
@@ -63,12 +43,8 @@ st.markdown("""
 
     @media print {
         .stSidebar, .stButton { display: none !important; }
-        .stApp { margin: 0 !important; padding: 0 !important; }
-        .kertas-a4 { 
-            box-shadow: none !important; 
-            margin: 0 !important; 
-            padding: 10mm 15mm 15mm 20mm !important;
-        }
+        .main { background-color: white !important; }
+        .kertas-a4 { box-shadow: none !important; margin: 0 !important; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -144,4 +120,4 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-st.write('</div>', unsafe_allow_html=True)
+st.write('
