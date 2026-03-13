@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 
-# 1. KONFIGURASI HALAMAN (KEMBALI KE LAYOUT SEMULA)
+# 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Cetak SPT Prokopim Ngada", layout="wide")
 
 st.markdown("""
@@ -9,7 +9,6 @@ st.markdown("""
     header, footer, #MainMenu {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    /* BACKGROUND ABU-ABU SEPERTI SEBELUMNYA */
     .main { background-color: #525659; }
     
     .kertas-a4 {
@@ -17,7 +16,7 @@ st.markdown("""
         width: 210mm;
         min-height: 297mm;
         padding: 15mm 20mm 20mm 25mm;
-        margin: 20px auto; /* Margin kembali normal agar terlihat proporsional */
+        margin: 20px auto;
         color: black;
         font-family: "Arial", sans-serif;
         font-size: 11pt;
@@ -25,7 +24,6 @@ st.markdown("""
         box-sizing: border-box;
     }
 
-    /* KOP SURAT MEPET BARIS */
     .kop-header { 
         text-align: center; 
         border-bottom: 3px solid black; 
@@ -70,54 +68,52 @@ bulan_list = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "A
 tgl_indo = f"{tgl_tetap.day} {bulan_list[tgl_tetap.month-1]} {tgl_tetap.year}"
 
 # 3. RENDER KERTAS
-st.write('<div class="kertas-a4">', unsafe_allow_html=True)
-
 st.markdown(f"""
-<div class="kop-header">
-    <h3 class="text-bold" style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
-    <h3 class="text-bold" style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h3>
-    <p style="margin:0; font-size:10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 21012</p>
-    <h3 class="text-bold" style="margin:0; font-size: 14pt;">BAJAWA</h3>
-</div>
+<div class="kertas-a4">
+    <div class="kop-header">
+        <h3 class="text-bold" style="margin:0; font-size: 14pt;">PEMERINTAH KABUPATEN NGADA</h3>
+        <h3 class="text-bold" style="margin:0; font-size: 14pt;">SEKRETARIAT DAERAH</h3>
+        <p style="margin:0; font-size:10pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 21012</p>
+        <h3 class="text-bold" style="margin:0; font-size: 14pt;">BAJAWA</h3>
+    </div>
 
-<h3 class="text-center text-bold text-underline" style="margin-top: 10px; margin-bottom:0;">SURAT PERINTAH TUGAS</h3>
-<p class="text-center" style="margin-top:0;">NOMOR : {no_spt}</p>
+    <h3 class="text-center text-bold text-underline" style="margin-top: 10px; margin-bottom:0;">SURAT PERINTAH TUGAS</h3>
+    <p class="text-center" style="margin-top:0;">NOMOR : {no_spt}</p>
 
-<br>
+    <br>
 
-<table class="tabel-data">
-    <tr><td width="15%">Dasar</td><td width="2%">:</td><td class="text-justify">{dasar}</td></tr>
-</table>
-
-<p class="text-center" style="letter-spacing: 3px; margin: 15px 0;">M E M E R I N T A H K A N</p>
-
-<table class="tabel-data">
-    <tr><td width="15%">Kepada</td><td width="5%">: 1.</td><td width="15%">Nama</td><td width="2%">:</td><td class="text-bold">{nama}</td></tr>
-    <tr><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{gol}</td></tr>
-    <tr><td></td><td></td><td>NIP</td><td>:</td><td>{nip}</td></tr>
-    <tr><td></td><td></td><td>Jabatan</td><td>:</td><td>{jabatan}</td></tr>
-</table>
-
-<br>
-
-<table class="tabel-data">
-    <tr><td width="15%">Untuk</td><td width="2%">:</td><td class="text-justify">{untuk}</td></tr>
-</table>
-
-<div style="margin-left:50%; margin-top:30px;">
     <table class="tabel-data">
-        <tr><td width="45%">Ditetapkan di</td><td>:</td><td>Bajawa</td></tr>
-        <tr><td>Pada Tanggal</td><td>:</td><td>{tgl_indo}</td></tr>
+        <tr><td width="15%">Dasar</td><td width="2%">:</td><td class="text-justify">{dasar}</td></tr>
     </table>
-    <div style="margin: 15px 0 0 25px;">
-        <p class="text-bold" style="margin:0;">An. BUPATI NGADA</p>
-        <p style="margin:0;">Pj. Sekretaris Daerah,</p>
-        <br><br><br><br>
-        <p class="text-bold text-underline" style="margin:0;">{nama_sekda}</p>
-        <p style="margin:0;">{gol}</p>
-        <p style="margin:0;">NIP. {nip_sekda}</p>
+
+    <p class="text-center" style="letter-spacing: 3px; margin: 15px 0;">M E M E R I N T A H K A N</p>
+
+    <table class="tabel-data">
+        <tr><td width="15%">Kepada</td><td width="5%">: 1.</td><td width="15%">Nama</td><td width="2%">:</td><td class="text-bold">{nama}</td></tr>
+        <tr><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{gol}</td></tr>
+        <tr><td></td><td></td><td>NIP</td><td>:</td><td>{nip}</td></tr>
+        <tr><td></td><td></td><td>Jabatan</td><td>:</td><td>{jabatan}</td></tr>
+    </table>
+
+    <br>
+
+    <table class="tabel-data">
+        <tr><td width="15%">Untuk</td><td width="2%">:</td><td class="text-justify">{untuk}</td></tr>
+    </table>
+
+    <div style="margin-left:50%; margin-top:30px;">
+        <table class="tabel-data">
+            <tr><td width="45%">Ditetapkan di</td><td>:</td><td>Bajawa</td></tr>
+            <tr><td>Pada Tanggal</td><td>:</td><td>{tgl_indo}</td></tr>
+        </table>
+        <div style="margin: 15px 0 0 25px;">
+            <p class="text-bold" style="margin:0;">An. BUPATI NGADA</p>
+            <p style="margin:0;">Pj. Sekretaris Daerah,</p>
+            <br><br><br><br>
+            <p class="text-bold text-underline" style="margin:0;">{nama_sekda}</p>
+            <p style="margin:0;">{gol}</p>
+            <p style="margin:0;">NIP. {nip_sekda}</p>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
-
-st.write('
