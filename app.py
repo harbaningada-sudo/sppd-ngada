@@ -12,8 +12,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN LOGO (TEMPEL KODE PANJANG DI ANTARA TANDA KUTIP) ---
-logo_data_url = "TEMPEL_KODE_PANJANG_KAMU_DI_SINI" 
+# --- BAGIAN LOGO (TEMPEL KODE PANJANG DI ANTARA KUTIP TIGA) ---
+logo_data_url = """PASTE_KODE_BASE64_MU_DI_SINI""" 
 
 if len(logo_data_url) > 100:
     logo_html = f'<img src="{logo_data_url}" class="logo-img">'
