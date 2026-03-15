@@ -11,7 +11,7 @@ st.markdown("""
     .stDeployButton { display:none; }
     .stApp { background-color: #525659 !important; }
 
-    /* Pengaturan Kertas di Layar Preview */
+    /* Container Kertas di Layar Preview */
     .main-container {
         display: flex;
         flex-direction: column;
@@ -27,7 +27,7 @@ st.markdown("""
         padding: 15mm 20mm; 
         margin-bottom: 30px;
         color: black !important; 
-        font-family: Arial, Helvetica, sans-serif; 
+        font-family: Arial, sans-serif; 
         box-sizing: border-box; 
         box-shadow: 0 0 20px rgba(0,0,0,0.5);
         display: block;
@@ -53,44 +53,28 @@ st.markdown("""
 
     /* --- LOGIKA KHUSUS CETAK (FORCING) --- */
     @media print {
-        /* 1. SEMBUNYIKAN SEMUA ELEMEN STREAMLIT */
-        [data-testid="stSidebar"], 
-        .stButton, 
-        .no-print, 
-        header, 
-        footer,
-        div[data-testid="stExpander"] { 
+        [data-testid="stSidebar"], .stButton, .no-print, header, footer, div[data-testid="stExpander"] { 
             display: none !important; 
         }
-        
-        /* 2. BERSIHKAN LATAR BELAKANG */
         .stApp, .main, .main-container { 
             background-color: white !important; 
             padding: 0 !important;
             margin: 0 !important;
             display: block !important;
         }
-        
-        /* 3. ATUR KERTAS AGAR TIDAK TERGESER */
         .kertas { 
             box-shadow: none !important; 
             margin: 0 !important; 
             width: 210mm !important; 
             border: none !important;
-            page-break-after: always !important; /* PAKSA PINDAH HALAMAN */
+            page-break-after: always !important; /* Paksa pindah halaman */
         }
-
-        /* 4. PAKSA GARIS TABEL MUNCUL */
         table, td {
             border: 1.5pt solid black !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
-
-        @page { 
-            size: A4; 
-            margin: 0; 
-        }
+        @page { size: A4; margin: 0; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -106,9 +90,9 @@ with st.sidebar:
         no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
         kode_no = st.text_input("Kode No", "094/Prokopim")
         maksud = st.text_area("Maksud Perjalanan", "Monitoring...")
-        tujuan = st.text_input("Tujuan", "Kecamatan Golewa")
+        tujuan = st.text_input("Tempat Tujuan", "Kecamatan Golewa")
         alat = st.text_input("Alat Angkut", "Mobil")
-        lama = st.text_input("Lama Hari", "1 (Satu) hari")
+        lama = st.text_input("Lama Hari", "1 (Satu) hari") # Variabel 'lama'
         mata_anggaran = st.text_input("Mata Anggaran (9b)", "")
 
     with st.expander("👤 DATA PEGAWAI", expanded=True):
@@ -125,8 +109,9 @@ with st.sidebar:
             p_gol = st.text_input(f"Gol P-{i+1}", "III/a", key=f"g{i}")
             p_jab = st.text_input(f"Jabatan P-{i+1}", "Perencana", key=f"j{i}")
             p_spd = st.text_input(f"No SPD P-{i+1}", f"531 /02/2026", key=f"spd{i}")
-            p_lbr = st.text_input(f"Lembar P-{i+1}", "I", key=f"lbr{i}")
-            daftar.append({"nama": p_n, "nip": p_nip, "gol": p_gol, "jab": p_jab, "spd": p_spd, "lbr": p_lbr})
+            p_lembar = st.text_input(f"Lembar P-{i+1}", "I", key=f"lbr{i}") # Input Lembar
+            # FIX: Kunci harus 'lembar' agar sesuai dengan pemanggilan di bawah
+            daftar.append({"nama": p_n, "nip": p_nip, "gol": p_gol, "jab": p_jab, "spd": p_spd, "lembar": p_lembar})
 
     with st.expander("🕒 TANDA TANGAN", expanded=False):
         tgl_ctk = st.date_input("Tanggal Cetak", datetime.now())
@@ -142,7 +127,6 @@ def tgl_str(d):
 
 # --- GENERATE HTML ---
 html_output = '<div class="main-container">'
-
 kop = f"""<div class="kop-daerah"><img src="data:image/png;base64,{LOGO_PEMDA}" style="width:70px; margin-right:20px;"><div style="flex:1; text-align:center;"><h3 style="margin:0;">PEMERINTAH KABUPATEN NGADA</h3><h2 style="margin:0;">SEKRETARIAT DAERAH</h2><p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p style="margin:0; font-size:10pt; font-weight:bold;">BAJAWA</p></div></div>"""
 ttd_box = f"""<div style="margin-left:55%; margin-top:30px; line-height:1.2; color:black;">Ditetapkan di : Bajawa<br>Pada Tanggal : {tgl_str(tgl_ctk)}<br><br><b>a.n. BUPATI NGADA</b><br><b>Sekretaris Daerah</b><br><b>u.b. Asisten Perekonomian dan Pembangunan,</b><br><br><br><br><b><u>{pjb_nama}</u></b><br>NIP. {pjb_nip}</div>"""
 
