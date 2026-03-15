@@ -6,6 +6,13 @@ import io
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="SPD Ngada - Excel Mode", layout="wide")
 
+st.markdown("""
+<style>
+    header, footer, #MainMenu { visibility: hidden; }
+    .stDeployButton { display:none; }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("📂 Export SPPD ke Excel")
 st.info("Pastikan sudah membuat file 'requirements.txt' berisi 'xlsxwriter' di GitHub agar tidak error.")
 
@@ -44,7 +51,7 @@ with st.sidebar:
         pjb_nama = st.text_input("Nama Pejabat", "Dr. Nicolaus Noywuli, S.Pt, M.Si")
         pjb_nip = st.text_input("NIP Pejabat", "19720921 200012 1 004")
 
-# 3. FUNGSI GENERATE EXCEL (MENGGUNAKAN XLSXWRITER)
+# 3. FUNGSI GENERATE EXCEL
 def generate_excel():
     output = io.BytesIO()
     try:
@@ -59,23 +66,16 @@ def generate_excel():
         f_underline = workbook.add_format({'bold': True, 'underline': True, 'font_name': 'Arial', 'font_size': 11})
 
         # --- SHEET 1: SPT ---
-        ws_spt = workbook.add_worksheet("SURAT PERINTAH TUGAS")
+        ws_spt = workbook.add_worksheet("SPT")
         ws_spt.set_column('A:E', 15)
         ws_spt.merge_range('A1:E1', 'PEMERINTAH KABUPATEN NGADA', f_header)
         ws_spt.merge_range('A2:E2', 'SEKRETARIAT DAERAH', f_header)
         ws_spt.merge_range('A3:E3', 'Jln. Soekarno - Hatta No. 1 BAJAWA', f_sub)
         
         ws_spt.merge_range('A5:E5', 'SURAT PERINTAH TUGAS', f_underline)
-        ws_spt.write('A5', 'SURAT PERINTAH TUGAS', workbook.add_format({'align': 'center', 'bold': True, 'underline': True}))
         ws_spt.merge_range('A6:E6', f'Nomor : {no_spt}', workbook.add_format({'align': 'center'}))
         
-        ws_spt.write('A8', 'Dasar', f_bold)
-        ws_spt.merge_range('B8:E8', 'DPA Bagian Perekonomian dan SDA TA 2026', f_table)
-        
-        row_spt = 10
-        ws_spt.merge_range(f'A{row_spt}:E{row_spt}', 'M E M E R I N T A H K A N', workbook.add_format({'align': 'center', 'bold': True}))
-        
-        row_spt += 2
+        row_spt = 8
         for i, p in enumerate(daftar):
             ws_spt.write(row_spt, 0, 'Kepada' if i==0 else '', f_bold)
             ws_spt.write(row_spt, 1, f"{i+1}. Nama", f_table)
@@ -84,18 +84,16 @@ def generate_excel():
             ws_spt.merge_range(row_spt+1, 2, row_spt+1, 4, p['nip'], f_table)
             row_spt += 2
 
-        # --- SHEET 2: SPD ---
+        # --- SHEET 2 & 3: SPD ---
         for idx, p in enumerate(daftar):
             ws = workbook.add_worksheet(f"SPD {idx+1}")
             ws.set_column('A:A', 4)
             ws.set_column('B:B', 25)
             ws.set_column('C:E', 18)
             
-            # KOP
             ws.merge_range('A1:E1', 'PEMERINTAH KABUPATEN NGADA', f_header)
             ws.merge_range('A2:E2', 'SEKRETARIAT DAERAH', f_header)
             
-            # TABEL SPD (Sederhana)
             items = [
                 ['1.', 'Pejabat Pemberi Perintah', 'BUPATI NGADA'],
                 ['2.', 'Nama Pegawai', p['nama']],
@@ -108,28 +106,26 @@ def generate_excel():
                 ['8.', 'Mata Anggaran', mata_anggaran]
             ]
             
-            row_spd = 8
+            r_spd = 8
             for row_data in items:
-                ws.write(row_spd, 0, row_data[0], f_table)
-                ws.write(row_spd, 1, row_data[1], f_table)
-                ws.merge_range(row_spd, 2, row_spd, 4, row_data[2], f_table)
-                row_spd += 1
+                ws.write(r_spd, 0, row_data[0], f_table)
+                ws.write(r_spd, 1, row_data[1], f_table)
+                ws.merge_range(r_spd, 2, r_spd, 4, row_data[2], f_table)
+                r_spd += 1
 
         workbook.close()
+        return output.getvalue()
     except Exception as e:
-        st.error(f"Gagal membuat Excel: {e}")
         return None
-        
-    return output.getvalue()
 
-# Tombol
-excel_file = generate_excel()
-if excel_file:
+# TAMPILKAN TOMBOL DOWNLOAD
+excel_data = generate_excel()
+if excel_data:
+    st.markdown("---")
+    st.subheader("✅ File Berhasil Dibuat")
     st.download_button(
-        label="📥 Download Hasil SPPD (Excel)",
-        data=excel_file,
-        file_name=f"SPPD_NGADA_{datetime.now().day}.xlsx",
+        label="📥 Download File Excel Sekarang",
+        data=excel_data,
+        file_name=f"SPPD_NGADA_{datetime.now().strftime('%d_%m_%Y')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-st.success("Selesai! File Excel siap digunakan.")
