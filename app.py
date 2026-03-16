@@ -6,12 +6,12 @@ st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
 
 st.markdown("""
 <style>
-    /* Sembunyikan elemen bawaan Streamlit agar tidak ikut tercetak */
+    /* Dasar Aplikasi */
     header, footer, #MainMenu { visibility: hidden; }
     .stDeployButton { display:none; }
     .stApp { background-color: #525659 !important; }
 
-    /* Pengaturan Layar (Preview) */
+    /* Pengaturan Kertas agar di Tengah */
     .main-container {
         display: flex;
         flex-direction: column;
@@ -20,14 +20,14 @@ st.markdown("""
         padding: 20px 0;
     }
 
-    /* KERTAS A4: Presisi Milimeter */
+    /* KERTAS A4: Putih Bersih & Teks Hitam */
     .kertas { 
-        background-color: white !important; 
+        background-color: #ffffff !important; 
         width: 210mm; 
         min-height: 297mm; 
         padding: 15mm 20mm; 
         margin-bottom: 30px;
-        color: black !important; 
+        color: #000000 !important; 
         font-family: Arial, Helvetica, sans-serif; 
         box-sizing: border-box; 
         box-shadow: 0 0 20px rgba(0,0,0,0.8);
@@ -35,60 +35,44 @@ st.markdown("""
         page-break-after: always;
     }
 
-    /* KOP SURAT: Garis Tebal Sesuai Aturan */
-    .kop-daerah { display: flex; align-items: center; border-bottom: 3.5pt solid black; padding-bottom: 5px; margin-bottom: 15px; }
-    .kop-daerah img { width: 75px; height: auto; margin-right: 20px; }
-    .kop-teks { flex: 1; text-align: center; color: black !important; line-height: 1.2; }
-    
     /* TABEL: Kunci Lebar Kolom agar Garis Vertikal Lurus */
     .tabel-border { 
         width: 100%; 
         border-collapse: collapse !important; 
-        border: 1.5pt solid black !important; 
-        table-layout: fixed; /* MENGUNCI LEBAR KOLOM */
+        border: 1.5pt solid #000000 !important; 
+        table-layout: fixed;
     }
     .tabel-border td { 
-        border: 1.5pt solid black !important; 
-        padding: 5px 8px !important; 
+        border: 1.5pt solid #000000 !important; 
+        padding: 6px 10px !important; 
         vertical-align: top; 
-        color: black !important;
+        color: #000000 !important;
         font-size: 10.5pt;
-        line-height: 1.3;
     }
+
+    .kop-daerah { display: flex; align-items: center; border-bottom: 3.5pt solid #000000; padding-bottom: 5px; margin-bottom: 15px; }
+    .kop-daerah img { width: 70px; height: auto; margin-right: 20px; }
+    
+    .logo-garuda-box { text-align: center; margin-bottom: 10px; }
+    .logo-garuda-box img { width: 80px; height: auto; }
 
     .text-center { text-align: center; } .text-bold { font-weight: bold; } .underline { text-decoration: underline; }
 
-    /* --- LOGIKA CETAK (FORCING LAYOUT) --- */
     @media print {
-        [data-testid="stSidebar"], .stButton, header, footer, .no-print { 
-            display: none !important; 
-        }
-        .stApp, .main-container { 
-            background-color: white !important; 
-            padding: 0 !important; 
-            margin: 0 !important; 
-        }
-        .kertas { 
-            box-shadow: none !important; 
-            margin: 0 !important; 
-            width: 210mm !important; 
-            padding: 10mm 15mm !important;
-        }
-        /* Memaksa garis tabel muncul pekat di kertas */
-        table, td { 
-            border: 1.5pt solid black !important; 
-            -webkit-print-color-adjust: exact !important; 
-            print-color-adjust: exact !important;
-        }
+        [data-testid="stSidebar"], .stButton, header, footer { display: none !important; }
+        .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
+        .kertas { box-shadow: none !important; margin: 0 !important; width: 210mm !important; padding: 10mm 15mm !important; }
+        table, td { border: 1.5pt solid black !important; -webkit-print-color-adjust: exact !important; }
         @page { size: A4; margin: 0; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN LOGO (Paste Kode Base64) ---
+# --- BAGIAN LOGO ---
 LOGO_PEMDA = "PASTE_KODE_BASE64_PEMDA_DI_SINI"
 LOGO_GARUDA = "PASTE_KODE_BASE64_GARUDA_DI_SINI"
 
+# 2. PANEL INPUT SIDEBAR
 with st.sidebar:
     st.header("📋 INPUT DATA")
     jenis = st.radio("📍 Jenis Perjalanan", ["Dalam Daerah", "Luar Daerah"])
@@ -136,15 +120,15 @@ html_output = '<div class="main-container">'
 
 kop_sekda = f"""<div class="kop-daerah">
     <img src="data:image/png;base64,{LOGO_PEMDA}">
-    <div class="kop-teks">
+    <div style="flex:1; text-align:center; color:black;">
         <h3 style="margin:0; font-size:14pt;">PEMERINTAH KABUPATEN NGADA</h3>
         <h2 style="margin:0; font-size:16pt;">SEKRETARIAT DAERAH</h2>
         <p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
-        <p style="margin:0; font-size:11pt; font-weight:bold;">BAJAWA</p>
+        <p style="margin:0; font-size:10pt; font-weight:bold;">BAJAWA</p>
     </div></div>"""
 
-kop_bupati = f"""<div style="text-align:center; margin-bottom:10px;">
-    <img src="data:image/png;base64,{LOGO_GARUDA}" style="width:85px;">
+kop_bupati = f"""<div class="logo-garuda-box">
+    <img src="data:image/png;base64,{LOGO_GARUDA}">
     <h2 style="margin:5px 0; color:black;">BUPATI NGADA</h2>
 </div>"""
 
@@ -172,4 +156,35 @@ html_output += f"""<div class="kertas">{s_kop}
 
 # 2. HALAMAN SPD
 for p in daftar:
-    html_output += f
+    html_output += f"""<div class="kertas">{kop_sekda}
+    <div style="margin-left:65%; font-size:9pt; color:black;">
+        <table>
+            <tr><td>Lembar Ke</td><td>: {p['lembar']}</td></tr>
+            <tr><td>Kode No</td><td>: {kode_no}</td></tr>
+            <tr><td>Nomor</td><td>: {p['spd']}</td></tr>
+        </table>
+    </div>
+    <h3 class="text-center text-bold underline" style="margin:10px 0; color:black;">SURAT PERINTAH DINAS (SPD)</h3>
+    <table class="tabel-border">
+        <tr><td width="5%">1.</td><td width="42%">Pejabat pemberi perintah</td><td colspan="3">BUPATI NGADA</td></tr>
+        <tr><td>2.</td><td>Nama Pegawai diperintah</td><td colspan="3"><b>{p['nama']}</b></td></tr>
+        <tr><td rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p['gol']}</td></tr>
+        <tr><td>b. Jabatan</td><td colspan="3">{p['jab']}</td></tr>
+        <tr><td>c. Tingkat Peraturan</td><td colspan="3"></td></tr>
+        <tr><td>4.</td><td>Maksud Perjalanan Dinas</td><td colspan="3">{maksud}</td></tr>
+        <tr><td>5.</td><td>Alat angkut</td><td colspan="3">{alat}</td></tr>
+        <tr><td rowspan="2">6.</td><td>a. Tempat Berangkat</td><td colspan="3">Bajawa</td></tr>
+        <tr><td>b. Tempat Tujuan</td><td colspan="3">{tujuan}</td></tr>
+        <tr><td rowspan="3">7.</td><td>Lamanya Perjalanan Dinas</td><td colspan="3">{lama}</td></tr>
+        <tr><td>a. Tanggal Berangkat</td><td colspan="3">16 Maret 2026</td></tr>
+        <tr><td>b. Tanggal Harus Kembali</td><td colspan="3">16 Maret 2026</td></tr>
+        <tr><td>8.</td><td>Pengikut: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nama</td><td width="20%" class="text-center">Tgl Lahir</td><td colspan="2" class="text-center">Keterangan</td></tr>
+        <tr><td></td><td>1.</td><td></td><td colspan="2"></td></tr>
+        <tr><td rowspan="3">9.</td><td>Pembebanan Anggaran</td><td colspan="3"></td></tr>
+        <tr><td>a. Instansi</td><td colspan="3">Bagian Perekonomian dan SDA</td></tr>
+        <tr><td>b. Mata Anggaran</td><td colspan="3">{anggaran}</td></tr>
+        <tr><td>10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
+    </table>{ttd_box}</div>"""
+
+html_output += '</div>'
+st.components.v1.html(html_output, height=1500, scrolling=True)
