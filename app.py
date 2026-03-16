@@ -4,14 +4,17 @@ from datetime import datetime
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
 
+# CSS SAKTI: Memaksa tampilan tetap putih, teks hitam, dan di tengah
 st.markdown("""
 <style>
-    /* Dasar Aplikasi */
+    /* Sembunyikan elemen bawaan Streamlit */
     header, footer, #MainMenu { visibility: hidden; }
     .stDeployButton { display:none; }
+    
+    /* Latar belakang aplikasi abu-abu gelap agar kertas terlihat kontras */
     .stApp { background-color: #525659 !important; }
 
-    /* Pengaturan Kertas agar Presisi di Tengah */
+    /* Container utama agar kertas di tengah (Tidak Meluber) */
     .main-container {
         display: flex;
         flex-direction: column;
@@ -20,7 +23,7 @@ st.markdown("""
         padding: 20px 0;
     }
 
-    /* KERTAS A4: Putih Bersih & Teks Hitam Pekat */
+    /* KERTAS A4: Putih Bersih, Teks Hitam Pekat */
     .kertas { 
         background-color: #ffffff !important; 
         width: 210mm; 
@@ -35,7 +38,7 @@ st.markdown("""
         page-break-after: always;
     }
 
-    /* KOP SURAT STANDAR */
+    /* KOP SURAT */
     .kop-daerah { display: flex; align-items: center; border-bottom: 3.5pt solid #000000; padding-bottom: 5px; margin-bottom: 15px; }
     .kop-daerah img { width: 75px; height: auto; margin-right: 20px; }
     .kop-teks { flex: 1; text-align: center; color: #000000 !important; line-height: 1.2; }
@@ -72,7 +75,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN LOGO ---
+# --- BAGIAN LOGO (Paste Kode Base64) ---
 LOGO_PEMDA = "PASTE_KODE_BASE64_PEMDA_DI_SINI"
 LOGO_GARUDA = "PASTE_KODE_BASE64_GARUDA_DI_SINI"
 
