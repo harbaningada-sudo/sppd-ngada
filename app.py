@@ -11,7 +11,7 @@ st.markdown("""
     .stDeployButton { display:none; }
     .stApp { background-color: #525659 !important; }
 
-    /* Pengaturan Kertas agar di Tengah */
+    /* Pengaturan Kertas agar Presisi di Tengah */
     .main-container {
         display: flex;
         flex-direction: column;
@@ -20,7 +20,7 @@ st.markdown("""
         padding: 20px 0;
     }
 
-    /* KERTAS A4: Putih Bersih & Teks Hitam */
+    /* KERTAS A4: Putih Bersih & Teks Hitam Pekat */
     .kertas { 
         background-color: #ffffff !important; 
         width: 210mm; 
@@ -35,7 +35,15 @@ st.markdown("""
         page-break-after: always;
     }
 
-    /* TABEL: Kunci Lebar Kolom agar Garis Vertikal Lurus */
+    /* KOP SURAT STANDAR */
+    .kop-daerah { display: flex; align-items: center; border-bottom: 3.5pt solid #000000; padding-bottom: 5px; margin-bottom: 15px; }
+    .kop-daerah img { width: 75px; height: auto; margin-right: 20px; }
+    .kop-teks { flex: 1; text-align: center; color: #000000 !important; line-height: 1.2; }
+    
+    .logo-garuda-box { text-align: center; margin-bottom: 15px; }
+    .logo-garuda-box img { width: 85px; height: auto; }
+
+    /* TABEL: Kunci Lebar Kolom agar Garis Vertikal Lurus Tembus */
     .tabel-border { 
         width: 100%; 
         border-collapse: collapse !important; 
@@ -44,20 +52,16 @@ st.markdown("""
     }
     .tabel-border td { 
         border: 1.5pt solid #000000 !important; 
-        padding: 6px 10px !important; 
+        padding: 5px 10px !important; 
         vertical-align: top; 
         color: #000000 !important;
         font-size: 10.5pt;
+        line-height: 1.4;
     }
-
-    .kop-daerah { display: flex; align-items: center; border-bottom: 3.5pt solid #000000; padding-bottom: 5px; margin-bottom: 15px; }
-    .kop-daerah img { width: 70px; height: auto; margin-right: 20px; }
-    
-    .logo-garuda-box { text-align: center; margin-bottom: 10px; }
-    .logo-garuda-box img { width: 80px; height: auto; }
 
     .text-center { text-align: center; } .text-bold { font-weight: bold; } .underline { text-decoration: underline; }
 
+    /* ATURAN CETAK PRINTER */
     @media print {
         [data-testid="stSidebar"], .stButton, header, footer { display: none !important; }
         .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
@@ -120,7 +124,7 @@ html_output = '<div class="main-container">'
 
 kop_sekda = f"""<div class="kop-daerah">
     <img src="data:image/png;base64,{LOGO_PEMDA}">
-    <div style="flex:1; text-align:center; color:black;">
+    <div class="kop-teks">
         <h3 style="margin:0; font-size:14pt;">PEMERINTAH KABUPATEN NGADA</h3>
         <h2 style="margin:0; font-size:16pt;">SEKRETARIAT DAERAH</h2>
         <p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
@@ -138,7 +142,7 @@ ttd_box = f"""<div style="margin-left:55%; margin-top:30px; line-height:1.2; col
     <b><u>{pejabat}</u></b><br>NIP. {nip_pjb}
 </div>"""
 
-# 1. HALAMAN SPT
+# --- 1. HALAMAN SPT ---
 s_kop = kop_bupati if jenis == "Luar Daerah" else kop_sekda
 rows_spt = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td width='2%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr>" for i,p in enumerate(daftar)])
 
@@ -154,11 +158,11 @@ html_output += f"""<div class="kertas">{s_kop}
     <tr><td width="15%">Untuk</td><td width="2%">:</td><td>{maksud} ke {tujuan}</td></tr>
 </table>{ttd_box}</div>"""
 
-# 2. HALAMAN SPD
+# --- 2. HALAMAN SPD ---
 for p in daftar:
     html_output += f"""<div class="kertas">{kop_sekda}
-    <div style="margin-left:65%; font-size:9pt; color:black;">
-        <table>
+    <div style="margin-left:65%; font-size:9.5pt; color:black;">
+        <table border="0">
             <tr><td>Lembar Ke</td><td>: {p['lembar']}</td></tr>
             <tr><td>Kode No</td><td>: {kode_no}</td></tr>
             <tr><td>Nomor</td><td>: {p['spd']}</td></tr>
@@ -178,7 +182,7 @@ for p in daftar:
         <tr><td rowspan="3">7.</td><td>Lamanya Perjalanan Dinas</td><td colspan="3">{lama}</td></tr>
         <tr><td>a. Tanggal Berangkat</td><td colspan="3">16 Maret 2026</td></tr>
         <tr><td>b. Tanggal Harus Kembali</td><td colspan="3">16 Maret 2026</td></tr>
-        <tr><td>8.</td><td>Pengikut: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nama</td><td width="20%" class="text-center">Tgl Lahir</td><td colspan="2" class="text-center">Keterangan</td></tr>
+        <tr><td>8.</td><td>Pengikut: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nama</td><td width="20%" class="text-center text-bold">Tgl Lahir</td><td colspan="2" class="text-center text-bold">Ket</td></tr>
         <tr><td></td><td>1.</td><td></td><td colspan="2"></td></tr>
         <tr><td rowspan="3">9.</td><td>Pembebanan Anggaran</td><td colspan="3"></td></tr>
         <tr><td>a. Instansi</td><td colspan="3">Bagian Perekonomian dan SDA</td></tr>
