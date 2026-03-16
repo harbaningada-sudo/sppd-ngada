@@ -6,12 +6,14 @@ st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
 
 st.markdown("""
 <style>
-    /* Dasar Aplikasi di Layar */
+    /* Dasar Aplikasi */
     header, footer, #MainMenu { visibility: hidden; }
     .stDeployButton { display:none; }
+    
+    /* Paksa Latar Belakang Aplikasi Abu-abu Gelap */
     .stApp { background-color: #525659 !important; }
 
-    /* Pengaturan Kertas di Layar Preview */
+    /* Container Utama */
     .main-container {
         display: flex;
         flex-direction: column;
@@ -20,6 +22,7 @@ st.markdown("""
         padding: 20px 0;
     }
 
+    /* KERTAS A4: DIPAKSA PUTIH SALJU & TEKS HITAM PEKAT */
     .kertas { 
         background-color: #ffffff !important; 
         width: 210mm; 
@@ -27,19 +30,25 @@ st.markdown("""
         padding: 15mm 20mm; 
         margin-bottom: 30px;
         color: #000000 !important; 
-        font-family: Arial, Helvetica, sans-serif; 
+        font-family: Arial, sans-serif; 
         box-sizing: border-box; 
         box-shadow: 0 0 20px rgba(0,0,0,0.8);
         display: block;
         page-break-after: always;
     }
 
+    /* Kop Surat */
+    .kop-daerah { display: flex; align-items: center; border-bottom: 3.5pt solid #000000; padding-bottom: 5px; margin-bottom: 15px; }
+    .kop-daerah img { width: 70px; height: auto; margin-right: 20px; }
+    
+    .logo-garuda-box { text-align: center; margin-bottom: 10px; }
+    .logo-garuda-box img { width: 80px; height: auto; }
+
     /* Tabel dengan Garis Hitam Tegas */
     .tabel-border { 
         width: 100%; 
         border-collapse: collapse !important; 
         border: 1.5pt solid #000000 !important; 
-        table-layout: fixed;
     }
     .tabel-border td { 
         border: 1.5pt solid #000000 !important; 
@@ -49,63 +58,23 @@ st.markdown("""
         font-size: 10.5pt;
     }
 
-    .kop-daerah { display: flex; align-items: center; border-bottom: 3.5pt solid #000000; padding-bottom: 5px; margin-bottom: 15px; }
-    .kop-daerah img { width: 70px; height: auto; margin-right: 20px; }
-    
-    .logo-garuda-box { text-align: center; margin-bottom: 10px; }
-    .logo-garuda-box img { width: 80px; height: auto; }
-
     .text-center { text-align: center; } .text-bold { font-weight: bold; } .underline { text-decoration: underline; }
 
-    /* --- LOGIKA SAKTI KHUSUS CETAK --- */
+    /* LOGIKA KHUSUS CETAK */
     @media print {
-        /* Sembunyikan SEMUA elemen Streamlit */
-        [data-testid="stSidebar"], 
-        button, 
-        header, 
-        footer, 
-        .no-print,
-        div[data-testid="stToolbar"],
-        div[data-testid="stDecoration"] { 
-            display: none !important; 
-        }
-
-        /* Paksa area utama jadi putih dan penuh */
-        .stApp, .main-container { 
-            background-color: white !important; 
-            padding: 0 !important;
-            margin: 0 !important;
-            display: block !important;
-        }
-
-        /* Hilangkan bayangan kertas dan margin luar */
-        .kertas { 
-            box-shadow: none !important; 
-            margin: 0 !important; 
-            width: 210mm !important; 
-            border: none !important;
-        }
-
-        /* Paksa garis tabel muncul pekat */
-        table, td {
-            border: 1.5pt solid black !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        @page { 
-            size: A4; 
-            margin: 0; 
-        }
+        [data-testid="stSidebar"], button, header, footer { display: none !important; }
+        .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
+        .kertas { box-shadow: none !important; margin: 0 !important; width: 210mm !important; }
+        table, td { border: 1.5pt solid black !important; -webkit-print-color-adjust: exact !important; }
+        @page { size: A4; margin: 0; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN LOGO ---
+# --- BAGIAN LOGO (PASTE DI SINI) ---
 LOGO_PEMDA = "PASTE_KODE_BASE64_PEMDA_DI_SINI"
 LOGO_GARUDA = "PASTE_KODE_BASE64_GARUDA_DI_SINI"
 
-# 2. PANEL INPUT SIDEBAR
 with st.sidebar:
     st.header("📋 INPUT DATA")
     jenis = st.radio("📍 Jenis Perjalanan", ["Dalam Daerah", "Luar Daerah"])
@@ -127,6 +96,7 @@ with st.sidebar:
         
         daftar = []
         for i in range(st.session_state.jml):
+            st.markdown(f"**Pegawai {i+1}**")
             p_n = st.text_input(f"Nama P-{i+1}", f"Nama {i+1}", key=f"n{i}")
             p_nip = st.text_input(f"NIP P-{i+1}", "19XXXXXXXXXXXXXX", key=f"nip{i}")
             p_gol = st.text_input(f"Gol P-{i+1}", "III/a", key=f"g{i}")
@@ -140,7 +110,6 @@ with st.sidebar:
         pejabat = st.text_input("Pejabat TTD", "Dr. Nicolaus Noywuli, S.Pt, M.Si")
         nip_pjb = st.text_input("NIP TTD", "19720921 200012 1 004")
 
-    # TOMBOL CETAK
     if st.button("🖨️ CETAK SEKARANG"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
@@ -148,49 +117,20 @@ def tgl_str(d):
     bln = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"]
     return f"{d.day} {bln[d.month-1]} {d.year}"
 
-# --- RENDER ---
+# --- RENDER KONTEN ---
 html_output = '<div class="main-container">'
-kop_sekda = f'<div class="kop-daerah"><img src="data:image/png;base64,{LOGO_PEMDA}"><div style="flex:1; text-align:center; color:black;"><h3 style="margin:0;">PEMERINTAH KABUPATEN NGADA</h3><h2 style="margin:0;">SEKRETARIAT DAERAH</h2><p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p style="margin:0; font-size:10pt; font-weight:bold;">BAJAWA</p></div></div>'
+
+kop_sekda = f'<div class="kop-daerah"><img src="data:image/png;base64,{LOGO_PEMDA}"><div class="kop-teks"><h3 style="margin:0;">PEMERINTAH KABUPATEN NGADA</h3><h2 style="margin:0;">SEKRETARIAT DAERAH</h2><p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p style="margin:0; font-size:10pt; font-weight:bold;">BAJAWA</p></div></div>'
 kop_bupati = f'<div class="logo-garuda-box"><img src="data:image/png;base64,{LOGO_GARUDA}"><h2 style="margin:5px 0; color:black;">BUPATI NGADA</h2></div>'
 ttd_box = f'<div style="margin-left:55%; margin-top:30px; line-height:1.2; color:black;">Ditetapkan di : Bajawa<br>Pada Tanggal : {tgl_str(tgl_ctk)}<br><br><b>a.n. BUPATI NGADA</b><br><b>Sekretaris Daerah</b><br><b>u.b. Asisten Perekonomian dan Pembangunan,</b><br><br><br><br><b><u>{pejabat}</u></b><br>NIP. {nip_pjb}</div>'
 
-# 1. SPT
-spt_kop = kop_bupati if jenis == "Luar Daerah" else kop_sekda
-html_output += f"""<div class="kertas">{spt_kop}
-<h3 class="text-center text-bold underline" style="color:black; margin-top:10px;">SURAT PERINTAH TUGAS</h3>
-<p class="text-center" style="margin-top:-10px; color:black;">NOMOR : {no_spt}</p>
-<table width="100%" style="font-size:10.5pt; color:black;"><tr><td width="15%">Dasar</td><td>: DPA Bagian Perekonomian dan SDA Setda Ngada Tahun Anggaran 2026</td></tr></table>
-<p class="text-center text-bold" style="margin:10px 0; color:black;">M E M E R I N T A H K A N</p>
-<table width="100%" style="font-size:10.5pt; color:black;">
-{"".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td>: <b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>NIP</td><td>: {p['nip']}</td></tr>" for i,p in enumerate(daftar)])}
-</table>
-<table width="100%" style="font-size:10.5pt; margin-top:10px; color:black;"><tr><td width="15%">Untuk</td><td>: {maksud} ke {tujuan}</td></tr></table>{ttd_box}</div>"""
+# SPT
+s_kop = kop_bupati if jenis == "Luar Daerah" else kop_sekda
+html_output += f'<div class="kertas">{s_kop}<h3 class="text-center text-bold underline" style="color:black;">SURAT PERINTAH TUGAS</h3><p class="text-center" style="margin-top:-10px; color:black;">NOMOR : {no_spt}</p><table width="100%" style="font-size:10.5pt; color:black;"><tr><td width="15%">Dasar</td><td>: DPA Bagian Perekonomian dan SDA Setda Ngada Tahun Anggaran 2026</td></tr></table><p class="text-center text-bold" style="margin:10px 0; color:black;">M E M E R I N T A H K A N</p><table width="100%" style="font-size:10.5pt; color:black;">' + "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td>: <b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>NIP</td><td>: {p['nip']}</td></tr>" for i,p in enumerate(daftar)]) + f'</table><table width="100%" style="font-size:10.5pt; margin-top:10px; color:black;"><tr><td width="15%">Untuk</td><td>: {maksud} ke {tujuan}</td></tr></table>{ttd_box}</div>'
 
-# 2. SPD
+# SPD
 for p in daftar:
-    html_output += f"""<div class="kertas">{kop_sekda}
-    <div style="margin-left:65%; font-size:9pt; color:black;"><table><tr><td>Lembar Ke</td><td>: {p["lembar"]}</td></tr><tr><td>Kode No</td><td>: {kode_no}</td></tr><tr><td>Nomor</td><td>: {p["spd"]}</td></tr></table></div>
-    <h3 class="text-center text-bold underline" style="margin:5px 0; color:black;">SURAT PERINTAH DINAS (SPD)</h3>
-    <table class="tabel-border">
-        <tr><td width="5%">1.</td><td width="42%">Pejabat pemberi perintah</td><td colspan="3">BUPATI NGADA</td></tr>
-        <tr><td>2.</td><td>Pegawai diperintah</td><td colspan="3"><b>{p["nama"]}</b></td></tr>
-        <tr><td rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p["gol"]}</td></tr>
-        <tr><td>b. Jabatan</td><td colspan="3">{p["jab"]}</td></tr>
-        <tr><td>c. Tingkat Peraturan</td><td colspan="3"></td></tr>
-        <tr><td>4.</td><td>Maksud Perjalanan</td><td colspan="3">{maksud}</td></tr>
-        <tr><td>5.</td><td>Alat Angkut</td><td colspan="3">{alat}</td></tr>
-        <tr><td rowspan="2">6.</td><td>a. Tempat Berangkat</td><td colspan="3">Bajawa</td></tr>
-        <tr><td>b. Tempat Tujuan</td><td colspan="3">{tujuan}</td></tr>
-        <tr><td rowspan="3">7.</td><td>Lamanya Perjalanan</td><td colspan="3">{lama}</td></tr>
-        <tr><td>a. Tgl Berangkat</td><td colspan="3">15 Maret 2026</td></tr>
-        <tr><td>b. Tgl Harus Kembali</td><td colspan="3">15 Maret 2026</td></tr>
-        <tr><td>8.</td><td>Pengikut: &nbsp;&nbsp;&nbsp;&nbsp; Nama</td><td width="20%" class="text-center">Tgl Lahir</td><td colspan="2" class="text-center">Ket</td></tr>
-        <tr><td></td><td>1.</td><td></td><td colspan="2"></td></tr>
-        <tr><td rowspan="3">9.</td><td>Pembebanan Anggaran</td><td colspan="3"></td></tr>
-        <tr><td>a. Instansi</td><td colspan="3">Bagian Perekonomian dan SDA</td></tr>
-        <tr><td>b. Mata Anggaran</td><td colspan="3">{anggaran}</td></tr>
-        <tr><td>10.</td><td>Keterangan lain</td><td colspan="3"></td></tr>
-    </table>{ttd_box}</div>"""
+    html_output += f'<div class="kertas">{kop_sekda}<div style="margin-left:65%; font-size:9pt; color:black;"><table><tr><td>Lembar Ke</td><td>: {p["lembar"]}</td></tr><tr><td>Kode No</td><td>: {kode_no}</td></tr><tr><td>Nomor</td><td>: {p["spd"]}</td></tr></table></div><h3 class="text-center text-bold underline" style="margin:5px 0; color:black;">SURAT PERINTAH DINAS (SPD)</h3><table class="tabel-border"><tr><td width="5%">1.</td><td width="42%">Pejabat pemberi perintah</td><td colspan="3">BUPATI NGADA</td></tr><tr><td>2.</td><td>Pegawai diperintah</td><td colspan="3"><b>{p["nama"]}</b></td></tr><tr><td rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p["gol"]}</td></tr><tr><td>b. Jabatan</td><td colspan="3">{p["jab"]}</td></tr><tr><td>c. Tingkat Peraturan</td><td colspan="3"></td></tr><tr><td>4.</td><td>Maksud Perjalanan</td><td colspan="3">{maksud}</td></tr><tr><td>5.</td><td>Alat Angkut</td><td colspan="3">{alat}</td></tr><tr><td rowspan="2">6.</td><td>a. Tempat Berangkat</td><td colspan="3">Bajawa</td></tr><tr><td>b. Tempat Tujuan</td><td colspan="3">{tujuan}</td></tr><tr><td rowspan="3">7.</td><td>Lamanya Perjalanan</td><td colspan="3">{lama}</td></tr><tr><td>a. Tgl Berangkat</td><td colspan="3">{tgl_str(datetime.now())}</td></tr><tr><td>b. Tgl Harus Kembali</td><td colspan="3">{tgl_str(datetime.now())}</td></tr><tr><td>8.</td><td>Pengikut: &nbsp;&nbsp;&nbsp;&nbsp; Nama</td><td width="20%" class="text-center">Tgl Lahir</td><td colspan="2" class="text-center">Ket</td></tr><tr><td></td><td>1.</td><td></td><td colspan="2"></td></tr><tr><td rowspan="3">9.</td><td>Pembebanan Anggaran</td><td colspan="3"></td></tr><tr><td>a. Instansi</td><td colspan="3">Bagian Perekonomian dan SDA</td></tr><tr><td>b. Mata Anggaran</td><td colspan="3">{anggaran}</td></tr><tr><td>10.</td><td>Keterangan lain</td><td colspan="3"></td></tr></table>{ttd_box}</div>'
 
 html_output += '</div>'
 st.components.v1.html(html_output, height=1500, scrolling=True)
