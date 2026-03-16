@@ -1,82 +1,27 @@
 import streamlit as st
 from datetime import datetime
+import pandas as pd
+import io
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Prokopim Ngada", layout="wide")
 
 st.markdown("""
 <style>
-    /* Sembunyikan elemen bawaan Streamlit */
     header, footer, #MainMenu { visibility: hidden; }
     .stDeployButton { display:none; }
-    
-    /* Latar belakang aplikasi abu-abu gelap */
-    .stApp { background-color: #525659 !important; }
-
-    /* Container utama agar kertas di tengah (Kunci Lebar) */
-    .main-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        padding: 20px 0;
-    }
-
-    /* KERTAS A4: Putih Bersih, Teks Hitam Pekat */
-    .kertas { 
-        background-color: #ffffff !important; 
-        width: 210mm; 
-        min-height: 297mm; 
-        padding: 15mm 20mm; 
-        margin-bottom: 30px;
-        color: #000000 !important; 
-        font-family: Arial, Helvetica, sans-serif; 
-        box-sizing: border-box; 
-        box-shadow: 0 0 20px rgba(0,0,0,0.8);
-        display: block;
-        page-break-after: always;
-    }
-
-    /* KOP SURAT STANDAR KANTOR */
-    .kop-daerah { display: flex; align-items: center; border-bottom: 3.5pt solid #000000; padding-bottom: 5px; margin-bottom: 15px; }
-    .kop-daerah img { width: 75px; height: auto; margin-right: 20px; }
-    .kop-teks { flex: 1; text-align: center; color: #000000 !important; line-height: 1.2; }
-    
-    .logo-garuda-box { text-align: center; margin-bottom: 15px; }
-    .logo-garuda-box img { width: 85px; height: auto; }
-
-    /* TABEL: Kunci Lebar Kolom agar Garis Vertikal Lurus Tembus */
-    .tabel-border { 
-        width: 100%; 
-        border-collapse: collapse !important; 
-        border: 1.5pt solid #000000 !important; 
-        table-layout: fixed;
-    }
-    .tabel-border td { 
-        border: 1.5pt solid #000000 !important; 
-        padding: 5px 10px !important; 
-        vertical-align: top; 
-        color: #000000 !important;
-        font-size: 10.5pt;
-        line-height: 1.4;
-    }
-
-    .text-center { text-align: center; } .text-bold { font-weight: bold; } .underline { text-decoration: underline; }
-
-    /* ATURAN CETAK PRINTER */
+    .main { background-color: #525659; }
     @media print {
-        [data-testid="stSidebar"], .stButton, header, footer { display: none !important; }
-        .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
-        .kertas { box-shadow: none !important; margin: 0 !important; width: 210mm !important; padding: 10mm 15mm !important; }
-        table, td { border: 1.5pt solid black !important; -webkit-print-color-adjust: exact !important; }
-        @page { size: A4; margin: 0; }
+        .no-print { display: none !important; }
+        .wrap { background-color: white !important; padding: 0 !important; margin: 0 !important; }
+        .kertas { box-shadow: none !important; margin: 0 !important; border: none !important; padding: 10mm 15mm !important; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN LOGO ---
-LOGO_PEMDA = "PASTE_KODE_BASE64_PEMDA_DI_SINI"
-LOGO_GARUDA = "PASTE_KODE_BASE64_GARUDA_DI_SINI"
+# --- BAGIAN LOGO (PASTE KODE BASE64 DI SINI) ---
+LOGO_PEMDA = """PASTE_KODE_BASE64_PEMDA_DI_SINI"""
+LOGO_GARUDA = """PASTE_KODE_BASE64_GARUDA_DI_SINI"""
 
 # 2. PANEL INPUT SIDEBAR
 with st.sidebar:
@@ -86,111 +31,140 @@ with st.sidebar:
     with st.expander("📄 DATA SURAT", expanded=True):
         no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
         kode_no = st.text_input("Kode No", "094/Prokopim")
-        maksud = st.text_area("Maksud", "Monitoring dan Pendataan Pemilik Tambang Pasir...")
-        tujuan = st.text_input("Tujuan", "Kecamatan Golewa")
-        alat = st.text_input("Alat Angkut", "Mobil / Kendaraan Dinas")
-        lama = st.text_input("Lama Hari", "1 (Satu) hari")
-        anggaran = st.text_input("Mata Anggaran (9b)", "Bagian Perekonomian dan SDA")
+        maksud = st.text_area("Maksud Perjalanan", "Monitoring dan Pendataan Pemilik Tambang Pasir...")
+        tujuan = st.text_input("Tempat Tujuan", "Kecamatan Golewa")
+        alat_angkut = st.text_input("Alat Angkutan", "Mobil")
+        mata_anggaran = st.text_input("Mata Anggaran (9b)", "")
 
-    with st.expander("👤 PEGAWAI"):
+    with st.expander("👤 DATA PEGAWAI", expanded=True):
         if 'jml' not in st.session_state: st.session_state.jml = 1
         c1, c2 = st.columns(2)
-        if c1.button("➕"): st.session_state.jml += 1
-        if c2.button("➖") and st.session_state.jml > 1: st.session_state.jml -= 1
+        if c1.button("➕ Tambah"): st.session_state.jml += 1
+        if c2.button("➖ Kurang") and st.session_state.jml > 1: st.session_state.jml -= 1
         
-        daftar = []
+        daftar_pegawai = []
         for i in range(st.session_state.jml):
             st.markdown(f"**Pegawai {i+1}**")
-            p_n = st.text_input(f"Nama P-{i+1}", f"Nama {i+1}", key=f"n{i}")
+            p_no_spd = st.text_input(f"Nomor SPD P-{i+1}", f"531 /02/2026", key=f"spd{i}")
+            p_lembar = st.text_input(f"Lembar Ke P-{i+1}", "I / II / III", key=f"lembar{i}")
+            p_nama = st.text_input(f"Nama P-{i+1}", f"Nama Pegawai {i+1}", key=f"n{i}")
             p_nip = st.text_input(f"NIP P-{i+1}", "19XXXXXXXXXXXXXX", key=f"nip{i}")
-            p_gol = st.text_input(f"Gol P-{i+1}", "III/a", key=f"g{i}")
-            p_jab = st.text_input(f"Jabatan P-{i+1}", "Perencana", key=f"j{i}")
-            p_spd = st.text_input(f"No SPD P-{i+1}", f"531 /02/2026", key=f"spd{i}")
-            p_lbr = st.text_input(f"Lembar P-{i+1}", "I", key=f"lbr{i}")
-            daftar.append({"nama": p_n, "nip": p_nip, "gol": p_gol, "jab": p_jab, "spd": p_spd, "lembar": p_lbr})
+            p_gol = st.text_input(f"Gol P-{i+1}", "Penata Muda - III/a", key=f"g{i}")
+            p_jabatan = st.text_input(f"Jabatan P-{i+1}", "Perencana Ahli Pertama", key=f"j{i}")
+            daftar_pegawai.append({"no_spd": p_no_spd, "lembar": p_lembar, "nama": p_nama, "nip": p_nip, "gol": p_gol, "jabatan": p_jabatan})
 
-    with st.expander("🕒 TTD"):
+    with st.expander("🕒 TTD", expanded=False):
+        tgl_p = st.date_input("Berangkat", datetime.now())
+        tgl_k = st.date_input("Kembali", datetime.now())
+        lama = st.text_input("Lama Hari", "1 (Satu) hari")
         tgl_ctk = st.date_input("Tanggal Cetak", datetime.now())
-        pejabat = st.text_input("Pejabat TTD", "Dr. Nicolaus Noywuli, S.Pt, M.Si")
-        nip_pjb = st.text_input("NIP TTD", "19720921 200012 1 004")
+        st.markdown("---")
+        ttd_an = st.text_input("a.n.", "BUPATI NGADA")
+        ttd_jab_tengah = st.text_input("Jabatan 1", "Sekretaris Daerah")
+        ttd_ub = st.text_input("Jabatan 2 (u.b.)", "Asisten Perekonomian dan Pembangunan")
+        ttd_nama = st.text_input("Nama Pejabat", "Dr. Nicolaus Noywuli, S.Pt, M.Si")
+        ttd_gol = st.text_input("Pangkat/Gol", "Pembina Utama Muda- IV/c")
+        ttd_nip = st.text_input("NIP", "19720921 200012 1 004")
 
-    if st.button("🖨️ CETAK SEKARANG"):
+    if st.button("🖨️ CETAK SEMUA"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
+# HELPER TANGGAL
 def tgl_str(d):
     bln = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"]
     return f"{d.day} {bln[d.month-1]} {d.year}"
 
-# --- RENDER PROSES ---
-html_output = '<div class="main-container">'
+# --- CSS ---
+style_html = """
+<style>
+    .wrap { display: flex; flex-direction: column; align-items: center; gap: 30px; background: #525659; padding: 20px; }
+    .kertas { background: white; width: 210mm; min-height: 297mm; padding: 10mm 15mm; color: black; font-family: Arial, sans-serif; box-sizing: border-box; page-break-after: always; position: relative; }
+    .kop-daerah { display: flex; align-items: center; border-bottom: 3.5px solid black; padding-bottom: 5px; margin-bottom: 10px; }
+    .tabel-border { width: 100%; border-collapse: collapse; border: 1.2px solid black; font-size: 9.5pt; table-layout: fixed; }
+    .tabel-border td { border: 1.2px solid black; padding: 8px; vertical-align: top; }
+    .text-center { text-align: center; } .text-bold { font-weight: bold; } .underline { text-decoration: underline; }
+    .inner-visum { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
+    .inner-visum td { border: none !important; padding: 0 0 2px 0 !important; font-size: 9.5pt; }
+</style>
+"""
 
-kop_sekda = f"""<div class="kop-daerah">
-    <img src="data:image/png;base64,{LOGO_PEMDA}">
-    <div class="kop-teks">
-        <h3 style="margin:0; font-size:14pt;">PEMERINTAH KABUPATEN NGADA</h3>
-        <h2 style="margin:0; font-size:16pt;">SEKRETARIAT DAERAH</h2>
-        <p style="margin:0; font-size:9pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p>
-        <p style="margin:0; font-size:10pt; font-weight:bold;">BAJAWA</p>
-    </div></div>"""
+content_html = f'<div class="wrap">{style_html}'
 
-kop_bupati = f"""<div class="logo-garuda-box">
-    <img src="data:image/png;base64,{LOGO_GARUDA}">
-    <h2 style="margin:5px 0; color:black;">BUPATI NGADA</h2>
-</div>"""
+# HELPERS
+header_kop_sekda = f"""<div class="kop-daerah"><img src="{LOGO_PEMDA}" style="width:65px; margin-right:15px;"><div style="flex:1; text-align:center;"><h3 style="margin:0; font-size:13pt;">PEMERINTAH KABUPATEN NGADA</h3><h2 style="margin:0; font-size:15pt;">SEKRETARIAT DAERAH</h2><p style="margin:0; font-size:8.5pt;">Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p style="margin:0; font-size:10pt; font-weight:bold; letter-spacing:1px;">BAJAWA</p></div></div>"""
 
-ttd_box = f"""<div style="margin-left:55%; margin-top:30px; line-height:1.2; color:black;">
-    Ditetapkan di : Bajawa<br>Pada Tanggal : {tgl_str(tgl_ctk)}<br><br>
-    <b>a.n. BUPATI NGADA</b><br><b>Sekretaris Daerah</b><br><b>u.b. Asisten Perekonomian dan Pembangunan,</b><br><br><br><br>
-    <b><u>{pejabat}</u></b><br>NIP. {nip_pjb}
-</div>"""
+def get_ttd_block():
+    return f"""<div style="margin-left:50%; margin-top:20px; line-height: 1.2; font-size: 10.5pt;"><p style="margin:0;">Ditetapkan di : Bajawa</p><p style="margin:0;">Pada Tanggal : {tgl_str(tgl_ctk)}</p><br><p class="text-bold" style="margin:0;">a.n. {ttd_an}</p><p class="text-bold" style="margin:0;">{ttd_jab_tengah}</p><p class="text-bold" style="margin:0;">u.b. {ttd_ub},</p><br><br><br><br><p class="text-bold underline" style="margin:0;">{ttd_nama}</p><p style="margin:0;">{ttd_gol}</p><p style="margin:0;">NIP. {ttd_nip}</p></div>"""
 
-# --- 1. HALAMAN SPT ---
-s_kop = kop_bupati if jenis == "Luar Daerah" else kop_sekda
-rows_spt = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td width='2%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr>" for i,p in enumerate(daftar)])
+# --- 1. SPT ---
+content_html += f'<div class="kertas">{"<div style=\'text-align:center;\'><img src=\'"+LOGO_GARUDA+"\' style=\'width:75px;\'><br><h3 style=\'margin:5px 0;\'>BUPATI NGADA</h3></div>" if jenis == "Luar Daerah" else header_kop_sekda}<h3 class="text-center text-bold underline" style="margin-top:10px;">SURAT PERINTAH TUGAS</h3><p class="text-center" style="margin-top:-10px;">NOMOR : {no_spt}</p><table width="100%" style="border-collapse:collapse; font-size:10.5pt;"><tr><td width="15%">Dasar</td><td>: {dasar_surat if jenis == "Luar Daerah" else "DPA Bagian Perekonomian dan SDA Setda Ngada Tahun Anggaran 2026"}</td></tr></table><p class="text-center text-bold" style="margin: 10px 0;">M E M E R I N T A H K A N</p><table width="100%" style="border-collapse:collapse; font-size:10.5pt;"><tr><td width="15%">Kepada</td><td colspan="3"></td></tr>{"".join([f"<tr><td width='5%'></td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td>: <b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>Pangkat/Gol</td><td>: {p['gol']}</td></tr><tr><td></td><td></td><td>NIP</td><td>: {p['nip']}</td></tr><tr><td></td><td></td><td>Jabatan</td><td>: {p['jabatan']}</td></tr><tr><td colspan=\'4\' height=\'6px\'></td></tr>" for i, p in enumerate(daftar_pegawai)])}</table><table width="100%" style="border-collapse:collapse; font-size:10.5pt;"><tr><td width="15%">Untuk</td><td>: {maksud} ke {tujuan}</td></tr></table>{get_ttd_block()}</div>'
 
-html_output += f"""<div class="kertas">{s_kop}
-<h3 class="text-center text-bold underline" style="color:black; margin-top:10px;">SURAT PERINTAH TUGAS</h3>
-<p class="text-center" style="margin-top:-10px; color:black;">NOMOR : {no_spt}</p>
-<table width="100%" style="font-size:11pt; color:black; border-collapse:collapse;">
-    <tr><td width="15%">Dasar</td><td width="2%">:</td><td>DPA Bagian Perekonomian dan SDA Setda Ngada Tahun Anggaran 2026</td></tr>
-</table>
-<p class="text-center text-bold" style="margin:15px 0; color:black;">M E M E R I N T A H K A N</p>
-<table width="100%" style="font-size:11pt; color:black; border-collapse:collapse;">{rows_spt}</table>
-<table width="100%" style="font-size:11pt; margin-top:10px; color:black; border-collapse:collapse;">
-    <tr><td width="15%">Untuk</td><td width="2%">:</td><td>{maksud} ke {tujuan}</td></tr>
-</table>{ttd_box}</div>"""
+# --- 2. SPD DEPAN ---
+for p in daftar_pegawai:
+    content_html += f"""<div class="kertas">{header_kop_sekda}<div style="margin-left:60%; font-size:9pt;"><table><tr><td>Lembar Ke</td><td>: {p['lembar']}</td></tr><tr><td>Kode No</td><td>: {kode_no}</td></tr><tr><td>Nomor</td><td>: {p['no_spd']}</td></tr></table></div><h3 class="text-center text-bold underline" style="margin-bottom:5px; margin-top:5px;">SURAT PERINTAH DINAS (SPD)</h3><table class="tabel-border"><tr><td width="5%">1.</td><td width="42%">Pejabat yang memberi perintah</td><td colspan="3"><b>BUPATI NGADA</b></td></tr><tr><td>2.</td><td>Nama Pegawai yang diperintahkan</td><td colspan="3"><b>{p['nama']}</b></td></tr><tr><td rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p['gol']}</td></tr><tr><td>b. Jabatan</td><td colspan="3">{p['jabatan']}</td></tr><tr><td>c. Tingkat Menurut Peraturan</td><td colspan="3"></td></tr><tr><td>4.</td><td>Maksud Perjalanan Dinas</td><td colspan="3">{maksud}</td></tr><tr><td>5.</td><td>Alat angkut yang digunakan</td><td colspan="3">{alat_angkut}</td></tr><tr><td rowspan="2">6.</td><td>a. Tempat Berangkat</td><td colspan="3">Bajawa</td></tr><tr><td>b. Tempat Tujuan</td><td colspan="3">{tujuan}</td></tr><tr><td rowspan="3">7.</td><td>Lamanya Perjalanan Dinas</td><td colspan="3">{lama}</td></tr><tr><td>a. Tanggal Berangkat</td><td colspan="3">{tgl_str(tgl_p)}</td></tr><tr><td>b. Tanggal Harus Kembali</td><td colspan="3">{tgl_str(tgl_k)}</td></tr><tr><td>8.</td><td>Pengikut&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nama</td><td width="20%" class="text-center">Tanggal Lahir</td><td colspan="2" class="text-center">Keterangan</td></tr><tr><td></td><td>1.</td><td></td><td colspan="2"></td></tr><tr><td></td><td>2.</td><td></td><td colspan="2"></td></tr><tr><td rowspan="3">9.</td><td>Pembebanan Anggaran</td><td colspan="3"></td></tr><tr><td>a. Instansi</td><td colspan="3">a. Bagian Perekonomian dan SDA</td></tr><tr><td>b. Mata Anggaran</td><td colspan="3">b. {mata_anggaran}</td></tr><tr><td>10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr></table>{get_ttd_block()}</div>"""
 
-# --- 2. HALAMAN SPD ---
-for p in daftar:
-    html_output += f"""<div class="kertas">{kop_sekda}
-    <div style="margin-left:65%; font-size:9.5pt; color:black;">
-        <table border="0">
-            <tr><td>Lembar Ke</td><td>: {p['lembar']}</td></tr>
-            <tr><td>Kode No</td><td>: {kode_no}</td></tr>
-            <tr><td>Nomor</td><td>: {p['spd']}</td></tr>
+# --- 3. SPD BELAKANG (VISUM FINAL) ---
+    visum_ttd_clean = f"""<div style="text-align:center; margin-top:10px; line-height:1.2; font-size:9.5pt;"><p class="text-bold" style="margin:0;">a.n. {ttd_an}</p><p class="text-bold" style="margin:0;">{ttd_jab_tengah}</p><br><br><br><br><p class="text-bold underline" style="margin:0;">{ttd_nama}</p><p style="margin:0;">{ttd_gol}</p><p style="margin:0;">NIP. {ttd_nip}</p></div>"""
+
+    content_html += f"""
+    <div class="kertas">
+        <table class="tabel-border">
+            <tr style="height: 170px;">
+                <td width="48%"></td>
+                <td>
+                    <table class="inner-visum">
+                        <tr><td width="40%">I. Berangkat dari</td><td>: Bajawa</td></tr>
+                        <tr><td>&nbsp;&nbsp;&nbsp;Ke</td><td>: {tujuan}</td></tr>
+                        <tr><td>&nbsp;&nbsp;&nbsp;Pada Tanggal</td><td>: {tgl_str(tgl_p)}</td></tr>
+                    </table>
+                    {visum_ttd_clean}
+                </td>
+            </tr>
+            <tr style="height: 160px;">
+                <td>
+                    <table class="inner-visum">
+                        <tr><td width="40%">II. Tiba di</td><td>: {tujuan}</td></tr>
+                        <tr><td>&nbsp;&nbsp;&nbsp;Pada Tanggal</td><td>: {tgl_str(tgl_p)}</td></tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="inner-visum">
+                        <tr><td width="40%">Berangkat dari</td><td>: {tujuan}</td></tr>
+                        <tr><td>Ke</td><td>: Bajawa</td></tr>
+                        <tr><td>Pada Tanggal</td><td>: {tgl_str(tgl_k)}</td></tr>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height: 100px;">
+                <td><table class="inner-visum"><tr><td width="40%">III. Tiba di</td><td>:</td></tr><tr><td>Pada Tanggal</td><td>:</td></tr></table></td>
+                <td><table class="inner-visum"><tr><td width="40%">Berangkat dari</td><td>:</td></tr><tr><td>Ke</td><td>:</td></tr><tr><td>Pada Tanggal</td><td>:</td></tr></table></td>
+            </tr>
+            <tr style="height: 100px;">
+                <td><table class="inner-visum"><tr><td width="40%">IV. Tiba di</td><td>:</td></tr><tr><td>Pada Tanggal</td><td>:</td></tr></table></td>
+                <td><table class="inner-visum"><tr><td width="40%">Berangkat dari</td><td>:</td></tr><tr><td>Ke</td><td>:</td></tr><tr><td>Pada Tanggal</td><td>:</td></tr></table></td>
+            </tr>
+            <tr style="height: 220px;">
+                <td>
+                    <table class="inner-visum">
+                        <tr><td width="40%">V. Tiba Kembali</td><td>: Bajawa</td></tr>
+                        <tr><td>&nbsp;&nbsp;&nbsp;Pada Tanggal</td><td>: {tgl_str(tgl_k)}</td></tr>
+                    </table>
+                </td>
+                <td>
+                    <p style="margin:0 0 10px 0; font-style:italic; font-size:8.5pt;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>
+                    {visum_ttd_clean}
+                </td>
+            </tr>
         </table>
-    </div>
-    <h3 class="text-center text-bold underline" style="margin:10px 0; color:black;">SURAT PERINTAH DINAS (SPD)</h3>
-    <table class="tabel-border">
-        <tr><td width="5%">1.</td><td width="42%">Pejabat pemberi perintah</td><td colspan="3">BUPATI NGADA</td></tr>
-        <tr><td>2.</td><td>Nama Pegawai diperintah</td><td colspan="3"><b>{p['nama']}</b></td></tr>
-        <tr><td rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p['gol']}</td></tr>
-        <tr><td>b. Jabatan</td><td colspan="3">{p['jab']}</td></tr>
-        <tr><td>c. Tingkat Peraturan</td><td colspan="3"></td></tr>
-        <tr><td>4.</td><td>Maksud Perjalanan Dinas</td><td colspan="3">{maksud}</td></tr>
-        <tr><td>5.</td><td>Alat angkut</td><td colspan="3">{alat}</td></tr>
-        <tr><td rowspan="2">6.</td><td>a. Tempat Berangkat</td><td colspan="3">Bajawa</td></tr>
-        <tr><td>b. Tempat Tujuan</td><td colspan="3">{tujuan}</td></tr>
-        <tr><td rowspan="3">7.</td><td>Lamanya Perjalanan Dinas</td><td colspan="3">{lama}</td></tr>
-        <tr><td>a. Tanggal Berangkat</td><td colspan="3">16 Maret 2026</td></tr>
-        <tr><td>b. Tanggal Harus Kembali</td><td colspan="3">16 Maret 2026</td></tr>
-        <tr><td>8.</td><td>Pengikut: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nama</td><td width="20%" class="text-center text-bold">Tgl Lahir</td><td colspan="2" class="text-center text-bold">Ket</td></tr>
-        <tr><td></td><td>1.</td><td></td><td colspan="2"></td></tr>
-        <tr><td rowspan="3">9.</td><td>Pembebanan Anggaran</td><td colspan="3"></td></tr>
-        <tr><td>a. Instansi</td><td colspan="3">Bagian Perekonomian dan SDA</td></tr>
-        <tr><td>b. Mata Anggaran</td><td colspan="3">{anggaran}</td></tr>
-        <tr><td>10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
-    </table>{ttd_box}</div>"""
+        <table class="tabel-border" style="border-top:none;">
+            <tr><td width="48%">VI. Catatan Lain-lain</td><td></td></tr>
+            <tr><td colspan="2">VII. Perhatian :</td></tr>
+            <tr><td colspan="2" style="font-size:8pt; text-align:justify; padding:5px 10px; line-height:1.3;">Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</td></tr>
+        </table>
+    </div>"""
 
-html_output += '</div>'
-st.components.v1.html(html_output, height=1500, scrolling=True)
+# --- 4. REGISTER ---
+reg_rows = "".join([f"<tr><td class='text-center'>{i+1}</td><td>{p['nama']}</td><td>{no_spt}</td><td>{p['no_spd']}</td><td>{maksud} ke {tujuan}</td><td>{tgl_str(tgl_p)}</td><td>{tgl_str(tgl_k)}</td><td></td></tr>" for i, p in enumerate(daftar_pegawai)])
+content_html += f"""<div class="kertas" style="width:297mm; min-height:210mm;"><h3 class="text-center">BUKU REGISTER PERJALANAN DINAS</h3><table class="tabel-border"><thead><tr style="background:#eee;"><th width="30">No</th><th>Nama</th><th>No SPT</th><th>No SPD</th><th>Maksud Tujuan</th><th width="80">Pergi</th><th width="80">Pulang</th><th>Ket</th></tr></thead><tbody>{reg_rows}</tbody></table></div></div>"""
+
+st.components.v1.html(content_html, height=2500, scrolling=True)
