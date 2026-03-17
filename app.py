@@ -5,7 +5,7 @@ import logo  # Memanggil file logo.py di repository kamu
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
 
-# CSS UNTUK PRESISI CETAK FULL LEGAL & SPACE TTD LUAS
+# CSS UNTUK PRESISI CETAK, FIT SHEET, LANDSCAPE REGISTER, & SPACE TTD
 st.markdown("""
 <style>
     header, footer, #MainMenu { visibility: hidden; }
@@ -16,11 +16,11 @@ st.markdown("""
         display: flex; flex-direction: column; align-items: center; width: 100%; padding: 5px 0;
     }
 
-    /* KERTAS LEGAL */
+    /* KERTAS UMUM (PORTRAIT LEGAL) */
     .kertas { 
         background-color: white !important; 
         width: 215.9mm; 
-        min-height: 340mm; /* Menambah tinggi agar full legal */
+        min-height: 335mm; 
         padding: 12mm 15mm 10mm 15mm; 
         margin-bottom: 20px; 
         color: black !important; 
@@ -32,7 +32,14 @@ st.markdown("""
         overflow: hidden;
     }
 
-    /* KOP SURAT & JUDUL (Line Spacing 1.0 Rapat) */
+    /* KHUSUS REGISTER (LANDSCAPE) */
+    .kertas-landscape {
+        width: 355.6mm !important;
+        min-height: 215.9mm !important;
+        padding: 15mm !important;
+    }
+
+    /* KOP & JUDUL (Line Spacing 1.0 Rapat) */
     .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 5px; }
     .kop-table td { border: none !important; padding: 0 !important; vertical-align: middle; }
     .kop-teks { text-align: center; line-height: 1.0 !important; } 
@@ -51,7 +58,7 @@ st.markdown("""
     /* FIX NOMOR 1. sd 10. SEJAJAR */
     .col-no { width: 35px !important; text-align: left !important; }
 
-    /* TABEL VISUM (SEJAJAR TITIK DUA) */
+    /* TABEL VISUM SEJAJAR TITIK DUA */
     .visum-table { width: 100%; border: none !important; border-collapse: collapse; margin: 0 !important; }
     .visum-table td { border: none !important; padding: 0 !important; font-size: 10pt; line-height: 1.2; color: black !important; vertical-align: top; }
 
@@ -63,12 +70,16 @@ st.markdown("""
     @media print {
         [data-testid="stSidebar"], .stButton { display: none !important; }
         .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
-        .kertas { 
-            box-shadow: none !important; margin: 0 !important; width: 215.9mm !important; 
-            transform: scale(1.0);
+        .kertas { box-shadow: none !important; margin: 0 !important; width: 215.9mm !important; transform: scale(1.0); }
+        
+        /* ATURAN LANDSCAPE UNTUK REGISTER */
+        .kertas-landscape { 
+            width: 355.6mm !important; 
+            transform: rotate(0deg) !important; 
         }
-        .kertas:last-child { page-break-after: avoid !important; }
-        @page { size: legal; margin: 0; }
+        
+        @page { size: legal portrait; margin: 0; }
+        .page-landscape { @page { size: legal landscape; } }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -131,7 +142,7 @@ if "SPT" in opsi_cetak:
 for p in daftar:
     if "SPD Depan" in opsi_cetak:
         html_out += f'''<div class="kertas">{kop_pemda}<div style="margin-left:60%; line-height:1.0;"><table class="visum-table"><tr><td width="40%">Lembar ke</td><td width="5%">:</td><td>{p["lembar"]}</td></tr><tr><td>Kode No</td><td>:</td><td>{kode_spd}</td></tr><tr><td>Nomor</td><td>:</td><td>{p["spd"]}</td></tr></table></div><div class="judul-rapat" style="margin-top:5px;"><h3 class="text-bold underline">SURAT PERJALANAN DINAS</h3><h3 class="text-bold">(SPD)</h3></div><table class="tabel-border">
-            <tr><td class="col-no">1.</td><td width="42%">Pejabat yang memberi perintah</td><td colspan="3"><b>BUPATI NGADA</b></td></tr>
+            <tr><td class="col-no">1.</td><td width="42%">Pejabat pemberi perintah</td><td colspan="3"><b>BUPATI NGADA</b></td></tr>
             <tr><td class="col-no">2.</td><td>Nama Pegawai yang diperintahkan</td><td colspan="3"><b>{p['nama']}</b></td></tr>
             <tr><td class="col-no" rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p['gol']}</td></tr>
             <tr><td>b. Jabatan</td><td colspan="3">{p['jab']}</td></tr>
@@ -152,24 +163,23 @@ for p in daftar:
         </table>{ttd_global}</div>'''
 
     if "SPD Belakang" in opsi_cetak:
-        # SPACE TTD BELAKANG FULL LEGAL
-        ttd_belakang = f'<div style="text-align:center; line-height:1.2; font-size:10pt;"><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div style="height:85px;"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'
+        ttd_belakang = f'<div style="text-align:center; line-height:1.2; font-size:10pt;"><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div style="height:90px;"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'
         def rv(num, label, val, date_v, is_num=True):
             n_col = f'<td width="10%">{num}</td>' if is_num else ""
             return f'''<table class="visum-table"><tr>{n_col}<td width="35%">{label}</td><td width="5%">:</td><td>{val}</td></tr><tr>{"<td></td>" if is_num else ""}<td>Pada Tanggal</td><td>:</td><td>{date_v}</td></tr></table>'''
 
         html_out += f'''<div class="kertas"><table class="tabel-border">
-            <tr style="height: 200px;"><td width="50%"></td><td style="padding:10px;">{rv("I.", "Berangkat dari", "Bajawa", tgl_bkt)}<table class="visum-table"><tr><td width="10%"></td><td width="35%">Ke</td><td width="5%">:</td><td>{tujuan}</td></tr></table>{ttd_belakang}</td></tr>
-            <tr style="height: 175px;"><td>{rv("II.", "Tiba di", tujuan, tgl_bkt)}</td><td style="padding:10px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="5%">:</td><td>Bajawa</td></tr></table></td></tr>
-            <tr style="height: 175px;"><td>{rv("III.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
-            <tr style="height: 175px;"><td>{rv("IV.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
-            <tr style="height: 200px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_belakang}</td></tr>
+            <tr style="height: 205px;"><td width="50%"></td><td style="padding:10px;">{rv("I.", "Berangkat dari", "Bajawa", tgl_bkt)}<table class="visum-table"><tr><td width="10%"></td><td width="35%">Ke</td><td width="5%">:</td><td>{tujuan}</td></tr></table>{ttd_belakang}</td></tr>
+            <tr style="height: 180px;"><td>{rv("II.", "Tiba di", tujuan, tgl_bkt)}</td><td style="padding:10px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="5%">:</td><td>Bajawa</td></tr></table></td></tr>
+            <tr style="height: 180px;"><td>{rv("III.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
+            <tr style="height: 180px;"><td>{rv("IV.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
+            <tr style="height: 205px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_belakang}</td></tr>
         </table><div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div><div style="border:1pt solid black; border-top:none; padding:8px; font-size:9pt; text-align:justify; color:black; line-height:1.3;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div></div>'''
 
-# 3. REGISTER
+# 3. REGISTER (LANDSCAPE)
 if "Register" in opsi_cetak:
     r_rows = "".join([f"<tr><td class='text-center'>{i+1}</td><td>{p['nama']}</td><td>{no_spt}</td><td>{p['spd']}</td><td>{tgl_bkt}</td><td>{tgl_kbl}</td><td>{lama}</td><td>{ket_reg}</td></tr>" for i, p in enumerate(daftar)])
-    html_out += f'''<div class="kertas"><h3 class="text-center text-bold">REGISTER SURAT PERJALANAN DINAS</h3><br><table class="tabel-border" style="font-size:9pt;"><thead><tr style="background:#eee;"><th>No</th><th>Nama Pegawai</th><th>Nomor SPT</th><th>Nomor SPD</th><th>Tanggal Berangkat</th><th>Tanggal Pulang</th><th>Lamanya</th><th>Keterangan</th></tr></thead><tbody>{r_rows}</tbody></table></div>'''
+    html_out += f'''<div class="kertas kertas-landscape page-landscape"><h3 class="text-center text-bold">REGISTER SURAT PERJALANAN DINAS</h3><br><table class="tabel-border" style="font-size:9pt; width:100%;"><thead><tr style="background:#eee;"><th>No</th><th>Nama Pegawai</th><th>Nomor SPT</th><th>Nomor SPD</th><th>Tanggal Berangkat</th><th>Tanggal Pulang</th><th>Lamanya</th><th>Keterangan</th></tr></thead><tbody>{r_rows}</tbody></table></div>'''
 
 html_out += '</div>'
 st.markdown(html_out, unsafe_allow_html=True)
