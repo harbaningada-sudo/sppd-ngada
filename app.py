@@ -4,11 +4,11 @@ from datetime import datetime
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
 
-# --- SOLUSI LOGO: AMBIL DARI GITHUB KAMU SENDIRI ---
-# Ganti 'username' dengan username GitHub kamu jika berbeda
-GITHUB_LOGO_URL = "https://raw.githubusercontent.com/harbaningada-sudo/sppd-ngada/main/logo_ngada.jpg.png"
-# Kita juga butuh link Garuda (saya pakai link yang sangat stabil dari Wikipedia)
-URL_GARUDA = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Coat_of_arms_of_Indonesia.svg/200px-Coat_of_arms_of_Indonesia.svg.png"
+# --- LINK LOGO (KUNCI UTAMA) ---
+# Menggunakan link GitHub kamu untuk Pemda
+URL_PEMDA = "https://raw.githubusercontent.com/harbaningada-sudo/sppd-ngada/main/logo_ngada.jpg.png"
+# Menggunakan link Wikipedia yang paling stabil untuk Garuda
+URL_GARUDA = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Coat_of_arms_of_Indonesia.svg/250px-Coat_of_arms_of_Indonesia.svg.png"
 
 st.markdown(f"""
 <style>
@@ -20,7 +20,6 @@ st.markdown(f"""
         display: flex; flex-direction: column; align-items: center; width: 100%; padding: 10px 0;
     }}
 
-    /* KERTAS LEGAL */
     .kertas {{ 
         background-color: white !important; 
         width: 215.9mm; 
@@ -34,13 +33,15 @@ st.markdown(f"""
         display: block;
     }}
 
+    /* KOP PEMDA */
     .kop-pemda {{ display: flex; align-items: center; border-bottom: 3.5pt solid black; padding-bottom: 2px; margin-bottom: 10px; }}
     .kop-pemda img {{ width: 75px; height: auto; margin-right: 20px; }}
-    .kop-teks {{ flex: 1; text-align: center; color: black !important; line-height: 1.0 !important; }}
+    .kop-teks {{ flex: 1; text-align: center; color: black !important; line-height: 1.1 !important; }}
     .kop-teks h3, .kop-teks h2, .kop-teks p {{ margin: 0; padding: 0; }}
     
-    .kop-garuda {{ text-align: center; margin-bottom: 10px; line-height: 1.0 !important; }}
-    .kop-garuda img {{ width: 85px; height: auto; margin-bottom: 5px; }}
+    /* KOP GARUDA (UNTUK SPT LUAR DAERAH) */
+    .kop-garuda {{ text-align: center; margin-bottom: 15px; line-height: 1.1 !important; }}
+    .kop-garuda img {{ width: 85px; height: auto; margin-bottom: 5px; display: inline-block; }}
 
     .tabel-border {{ 
         width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; table-layout: fixed;
@@ -50,7 +51,7 @@ st.markdown(f"""
     }}
 
     .tabel-polos {{ width: 100%; border-collapse: collapse; border: none !important; }}
-    .tabel-polos td {{ border: none !important; padding: 2px 0 !important; vertical-align: top; color: black !important; font-size: 10.5pt; line-height: 1.2; }}
+    .tabel-polos td {{ border: none !important; padding: 2px 0 !important; vertical-align: top; color: black !important; font-size: 11pt; line-height: 1.2; }}
 
     .text-center {{ text-align: center; }} .text-bold {{ font-weight: bold; }} .underline {{ text-decoration: underline; }}
 
@@ -71,7 +72,7 @@ with st.sidebar:
     with st.expander("📄 DATA SURAT", expanded=True):
         no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
         kode_no_spd = st.text_input("Kode No SPD", "094/Prokopim")
-        maksud = st.text_area("Maksud", "Dalam Rangka Mendampingi Kunjungan...")
+        maksud = st.text_area("Maksud", "Dalam Rangka Mendampingi Kunjungan Kementerian...")
         tujuan = st.text_input("Tujuan", "Kecamatan Jerebuu")
         alat = st.text_input("Alat Angkut", "Mobil Dinas")
         lama = st.text_input("Lama Hari", "1 (Satu) hari")
@@ -79,7 +80,7 @@ with st.sidebar:
 
     with st.expander("👤 DATA PEGAWAI"):
         if 'jml' not in st.session_state: st.session_state.jml = 1
-        if st.button("➕ Tambah Pegawai"): st.session_state.jml += 1
+        if st.button("➕ Tambah"): st.session_state.jml += 1
         daftar = []
         for i in range(st.session_state.jml):
             n = st.text_input(f"Nama P-{i+1}", f"Nama {i+1}", key=f"n{i}")
@@ -104,16 +105,28 @@ def tgl_str(d):
 # --- LOGIKA RENDER ---
 html_out = '<div class="main-container">'
 
-kop_pemda_html = f'<div class="kop-pemda"><img src="{GITHUB_LOGO_URL}"><div class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></div></div>'
+# TEMPLATE KOP
+kop_pemda_html = f'<div class="kop-pemda"><img src="{URL_PEMDA}"><div class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></div></div>'
 kop_garuda_html = f'<div class="kop-garuda"><img src="{URL_GARUDA}"><h2>BUPATI NGADA</h2></div>'
-ttd_box = f'<div style="margin-left:55%; margin-top:20px; line-height:1.2; color:black; font-size:10.5pt;"><table class="tabel-polos"><tr><td width="40%">Ditetapkan di</td><td>: Bajawa</td></tr><tr><td>Pada Tanggal</td><td>: {tgl_str(datetime.now())}</td></tr></table><br><b>An. BUPATI NGADA</b><br>{jab_ttd_inp},<br><br><br><br><br><b><u>{pjb}</u></b><br>NIP. {nip_ttd_inp}</div>'
+
+# TANDA TANGAN BOX
+ttd_global = f"""
+<div style="margin-left:55%; margin-top:20px; line-height:1.2; color:black; font-size:11pt;">
+    <table class="tabel-polos" style="width:100%;">
+        <tr><td width="40%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr>
+        <tr><td>Pada Tanggal</td><td>:</td><td>{tgl_str(datetime.now())}</td></tr>
+    </table><br>
+    <b>An. BUPATI NGADA</b><br>{jab_ttd_inp},<br><br><br><br><br>
+    <b><u>{pjb}</u></b><br>NIP. {nip_ttd_inp}
+</div>
+"""
 
 # 1. SPT
 s_kop = kop_garuda_html if jenis == "Luar Daerah" else kop_pemda_html
-peg_rows = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td>: <b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>Pangkat/Gol</td><td>: {p['gol']}</td></tr><tr><td></td><td></td><td>NIP</td><td>: {p['nip']}</td></tr><tr><td></td><td></td><td>Jabatan</td><td>: {p['jab']}</td></tr>" for i, p in enumerate(daftar)])
-html_out += f'<div class="kertas">{s_kop}<div style="margin-top:10px;"><h3 class="text-center text-bold underline" style="margin:0;">SURAT PERINTAH TUGAS</h3><p class="text-center" style="margin:0;">NOMOR : {no_spt}</p></div><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Dasar</td><td>: {anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0;">M E M E R I N T A H K A N</p><table class="tabel-polos">{peg_rows}</table><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Untuk</td><td>: {maksud} ke {tujuan}</td></tr></table>{ttd_box}</div>'
+peg_rows = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='18%'>Nama</td><td width='2%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
+html_out += f'<div class="kertas">{s_kop}<div style="margin-top:10px;"><h3 class="text-center text-bold underline" style="margin:0;">SURAT PERINTAH TUGAS</h3><p class="text-center" style="margin:0;">NOMOR : {no_spt}</p></div><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Dasar</td><td width="2%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0; letter-spacing:2px;">M E M E R I N T A H K A N</p><table class="tabel-polos">{peg_rows}</table><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Untuk</td><td width="2%">:</td><td>{maksud} ke {tujuan}</td></tr></table>{ttd_global}</div>'
 
-# 2. SPD DEPAN & BELAKANG
+# 2. SPD
 for p in daftar:
     html_out += f"""<div class="kertas">{kop_pemda_html}
     <div style="margin-left:60%; font-size:10pt; line-height:1.0;">
@@ -139,9 +152,9 @@ for p in daftar:
         <tr><td>a. Instansi</td><td colspan="3">Bagian Perekonomian dan SDA</td></tr>
         <tr><td>b. Mata Anggaran</td><td colspan="3"></td></tr>
         <tr><td>10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
-    </table>{ttd_box}</div>"""
+    </table>{ttd_global}</div>"""
 
-    # BELAKANG
+    # 3. VISUM
     ttd_v = f'<div style="text-align:center; line-height:1.1; font-size:10pt; color:black;"><br><b>An. BUPATI NGADA</b><br>{jab_ttd_inp},<br><br><br><br><b><u>{pjb}</u></b><br>NIP. {nip_ttd_inp}</div>'
     html_out += f"""<div class="kertas">
     <table class="tabel-border">
@@ -153,7 +166,8 @@ for p in daftar:
     </table>
     <div style="border:1pt solid black; border-top:none; padding:8px; font-size:10pt;"><b>VI. Catatan Lain-lain</b></div>
     <div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.5pt; text-align:justify; color:black; line-height:1.2;">
-        <b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD bertanggung jawab berdasarkan peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.
+        <b>VII. Perhatian :</b><br>
+        Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.
     </div></div>"""
 
 html_out += '</div>'
