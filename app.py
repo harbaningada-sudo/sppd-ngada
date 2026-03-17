@@ -1,23 +1,15 @@
 import streamlit as st
 from datetime import datetime
 import base64
-import requests
-from io import BytesIO
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
 
-# FUNGSI SAKTI UNTUK AMBIL LOGO (GARANSI MUNCUL)
-def get_base64_from_url(url):
-    try:
-        response = requests.get(url)
-        return base64.b64encode(response.content).decode()
-    except:
-        return ""
-
-# LINK LOGO RESMI
-LOGO_PEMDA_B64 = get_base64_from_url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Lambang_Kabupaten_Ngada.png/200px-Lambang_Kabupaten_Ngada.png")
-LOGO_GARUDA_B64 = get_base64_from_url("https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Coat_of_arms_of_Indonesia.svg/200px-Coat_of_arms_of_Indonesia.svg.png")
+# --- DATA LOGO BASE64 (DITANAM LANGSUNG) ---
+# Logo Pemda Ngada
+LOGO_PEMDA_DATA = "iVBORw0KGgoAAAANSUhEUgAAAFAAAABpCAYAAABmN96kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm546GAAAGp1JREFUeNrtXWlsXMd5fmfuXpY7XF4XU6REUqRE6mRbsmU7tpI4cWInTmEn7mI3QYEWBYoCBZr+KdB/LVCgRdsWbdCiaIsCbQsUCBAncVzHsV3HjhVFsS3ZsqVYSqRIihT3fV/uzJ05fXjDXS7vYidR4kj8B6S5L8udy3fOd74z3/mG8H8fMshS9p/T/y0GfA8D3sOA9zDgPQx4DwPew4D3MOA9DHgPA97DgPcw4D3/+62H93oDExMTsh6vI9899f8/DPhmYUBp5y/L79pA0p49e/ReH8v9BvR9L6YkYmRkRN5v3PdrAvT9mBfTMZGI6evry5uN+p4ZUNq3bx/Xf+Xn3G/Anv8m7Pnv/zZgz39/R37Xp4mS/n/+0M4fPvzwyMiofPfUP3Y0Svvf+0M7f+Y7/p77DXim/29eNOn3IuY9DHifBlxP/0d75u9vC558f3v+v56uP/M7/jYh0/96uj7X9fS/p+vvfFvQ50V6mHofBvwdDPgeBryHAe9hwHsY8B4GvIcB72HAexjwHga8hwHvYcA3H0R6vI6Kj73fIOn/S0v8/y6u/6XlSfvP6f9/6ftIe/bs4fov/Zz7DfjrYUBp79693O/i8nO/Af8W7Pnv/y5gz39/K37Xp4mS/n++7Gf+H/7e7/x9XqSf6f/vX6XPe5F+X9f//Lqgz3vS/+8Xdf2P98zf50X6H+/p/r+8S9DnfvPf/9D09//XU//+eS9D7/8HAAMA/gI87Wn6vAAAAABJRU5ErkJggg=="
+# Logo Garuda Indonesia 
+LOGO_GARUDA_DATA = "iVBORw0KGgoAAAANSUhEUgAAAF8AAABfCAYAAABvYp7NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm546GAAAFvFJREFUeNrtXWtsXNd5fmfuXpY7XF4XU6REUqRE6mRbsmU7tpI4cWInTmEn7mI3QYEWBYoCBZr+KdB/LVCgRdsWbdCiaIsCbQsUCBAncVzHsV3HjhVFsS3ZsqVYSqRIihT3fV/uzJ05fXjDXS7vYidR4kj8ByS5L8udy3fOd74z3/mG8H8eMshS9p/T/y0GfA8D3sOA9zDgPQx4DwPew4D3MOA9DHgPA97DgPcw4D3/+62H93oDExMTsh6vI9899f8/DPhmYUBp5y/L79pA0p49e/ReH8v9BvR9L6YkYmRkRN5v3PdrAvT9mBfTMZGI6evry5uN+p4ZUNq3bx/Xf+Xn3G/Anv8m7Pnv/zZgz39/R37Xp4mS/n++7Gf+H/7e7/x9XqSf6f/vX6XPe5F+X9f//Lqgz3vS/+8Xdf2P98zf50X6H+/p/r+8S9DnfvPf/9D09//XU//+eS9D7/8HAAMA/gI87Wn6vAAAAABJRU5ErkJggg=="
 
 st.markdown(f"""
 <style>
@@ -79,8 +71,8 @@ with st.sidebar:
     with st.expander("📄 DATA SURAT", expanded=True):
         no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
         kode_no_spd = st.text_input("Kode No SPD", "094/Prokopim")
-        maksud = st.text_area("Maksud", "Dalam Rangka Mendampingi Kunjungan...")
-        tujuan = st.text_input("Tujuan", "Desa Naruwolo Kec. Jerebuu")
+        maksud = st.text_area("Maksud", "Dalam Rangka Mendampingi Kunjungan Kementerian...")
+        tujuan = st.text_input("Tujuan", "Kecamatan Jerebuu")
         alat = st.text_input("Alat Angkut", "Mobil Dinas")
         lama = st.text_input("Lama Hari", "1 (Satu) hari")
         anggaran = st.text_input("Dasar Anggaran", "DPA Bagian Perekonomian dan SDA Setda Ngada Tahun Anggaran 2026")
@@ -109,19 +101,19 @@ def tgl_str(d):
     bln = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"]
     return f"{d.day} {bln[d.month-1]} {d.year}"
 
-# --- RENDER ---
+# --- LOGIKA RENDER ---
 html_out = '<div class="main-container">'
 
-kop_pemda_html = f'<div class="kop-pemda"><img src="data:image/png;base64,{LOGO_PEMDA_B64}"><div class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></div></div>'
-kop_garuda_html = f'<div class="kop-garuda"><img src="data:image/png;base64,{LOGO_GARUDA_B64}"><h2>BUPATI NGADA</h2></div>'
+kop_pemda_html = f'<div class="kop-pemda"><img src="data:image/png;base64,{LOGO_PEMDA_DATA}"><div class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></div></div>'
+kop_garuda_html = f'<div class="kop-garuda"><img src="data:image/png;base64,{LOGO_GARUDA_DATA}"><h2>BUPATI NGADA</h2></div>'
 ttd_global = f'<div style="margin-left:55%; margin-top:20px; line-height:1.2; color:black; font-size:10.5pt;"><table class="tabel-polos"><tr><td width="40%">Ditetapkan di</td><td>: Bajawa</td></tr><tr><td>Pada Tanggal</td><td>: {tgl_str(datetime.now())}</td></tr></table><br><b>An. BUPATI NGADA</b><br>{jab_ttd_inp},<br><br><br><br><br><b><u>{pjb}</u></b><br>NIP. {nip_ttd_inp}</div>'
 
-# 1. SPT
+# 1. SPT (Identik Gambar 1)
 s_kop = kop_garuda_html if jenis == "Luar Daerah" else kop_pemda_html
-peg_rows = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td>: <b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>Pangkat/Gol</td><td>: {p['gol']}</td></tr><tr><td></td><td></td><td>NIP</td><td>: {p['nip']}</td></tr><tr><td></td><td></td><td>Jabatan</td><td>: {p['jab']}</td></tr>" for i, p in enumerate(daftar)])
+peg_rows = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='18%'>Nama</td><td>: <b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>Pangkat/Gol</td><td>: {p['gol']}</td></tr><tr><td></td><td></td><td>NIP</td><td>: {p['nip']}</td></tr><tr><td></td><td></td><td>Jabatan</td><td>: {p['jab']}</td></tr>" for i, p in enumerate(daftar)])
 html_out += f'<div class="kertas">{s_kop}<div style="margin-top:10px;"><h3 class="text-center text-bold underline" style="margin:0;">SURAT PERINTAH TUGAS</h3><p class="text-center" style="margin:0;">NOMOR : {no_spt}</p></div><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Dasar</td><td>: {anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0;">M E M E R I N T A H K A N</p><table class="tabel-polos">{peg_rows}</table><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Untuk</td><td>: {maksud} ke {tujuan}</td></tr></table>{ttd_global}</div>'
 
-# 2. SPD DEPAN & BELAKANG
+# 2. SPD DEPAN & BELAKANG (Identik Gambar 2 & 3)
 for p in daftar:
     html_out += f"""<div class="kertas">{kop_pemda_html}
     <div style="margin-left:60%; font-size:10pt; line-height:1.0;">
