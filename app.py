@@ -20,8 +20,8 @@ st.markdown("""
     .kertas { 
         background-color: white !important; 
         width: 215.9mm; 
-        min-height: 330mm; 
-        padding: 10mm 15mm; 
+        min-height: 335mm; 
+        padding: 5mm 15mm; 
         margin-bottom: 20px; 
         color: black !important; 
         font-family: Arial, sans-serif; 
@@ -32,11 +32,11 @@ st.markdown("""
         break-inside: avoid;
     }
 
-    /* POSISI HALAMAN BELAKANG (VISUM) - DISESUAIKAN AGAR NAIK SEDIKIT */
+    /* POSISI HALAMAN BELAKANG (VISUM) */
     .kertas-belakang { margin-top: 10mm !important; }
 
     /* KOP SURAT & JUDUL (Line Spacing 1.0 Rapat Sempurna) */
-    .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 10px; }
+    .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 5px; }
     .kop-table td { border: none !important; padding: 0 !important; vertical-align: middle; }
     .kop-teks { text-align: center; line-height: 1.0 !important; } 
     .kop-teks h3, .kop-teks h2, .kop-teks p { margin: 0; line-height: 1.0 !important; padding: 1px 0; }
@@ -47,7 +47,7 @@ st.markdown("""
     .judul-surat h3, .judul-surat p { margin: 0; line-height: 1.0 !important; }
 
     /* ISI SURAT (Line Spacing 1.5) */
-    .isi-surat { line-height: 1.5 !important; margin-top: 15px; }
+    .isi-surat { line-height: 1.5 !important; margin-top: 10px; }
 
     /* TABEL SPD & SEJAJARKAN NOMOR 1. */
     .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; table-layout: fixed; }
@@ -58,7 +58,7 @@ st.markdown("""
     .visum-table { width: 100%; border: none !important; border-collapse: collapse; margin: 0 !important; }
     .visum-table td { border: none !important; padding: 0 !important; font-size: 10.5pt; line-height: 1.2; color: black !important; vertical-align: top; }
 
-    /* SPACE TANDA TANGAN LEBAR UNTUK CAP */
+    /* SPACE TANDA TANGAN LEBAR */
     .space-ttd { height: 110px; } 
 
     .text-center { text-align: center; } .text-bold { font-weight: bold; } .underline { text-decoration: underline; }
@@ -68,7 +68,7 @@ st.markdown("""
         .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
         .kertas { 
             box-shadow: none !important; margin: 0 !important; width: 215.9mm !important; 
-            transform: scale(1.02); /* Fit to sheet */
+            transform: scale(1.02);
             transform-origin: top center;
         }
         @page { size: legal; margin: 0; }
@@ -121,14 +121,14 @@ with st.sidebar:
 # --- TEMPLATE KOMPONEN ---
 kop_pemda = f'''<table class="kop-table"><tr><td width="15%"><img src="data:image/png;base64,{logo.PEMDA}" width="75"></td><td class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></td><td width="15%"></td></tr></table>'''
 
-ttd_layout = f'''<div style="margin-left:55%; margin-top:20px; line-height:1.3; color:black;"><table class="visum-table"><tr><td width="40%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr><tr><td>Pada Tanggal</td><td>:</td><td>{tgl_bkt}</td></tr></table><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div class="space-ttd"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'''
+ttd_layout = f'''<div style="margin-left:55%; margin-top:15px; line-height:1.3; color:black;"><table class="visum-table"><tr><td width="40%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr><tr><td>Pada Tanggal</td><td>:</td><td>{tgl_bkt}</td></tr></table><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div class="space-ttd"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'''
 
 html_out = '<div class="main-container">'
 
 # 1. SPT
 if "SPT" in opsi_cetak:
     peg_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='3%'>:</td><td width='4%'>{i+1}.</td><td width='25%'>Nama</td><td width='3%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
-    html_out += f'<div class="kertas">{kop_pemda}<div class="judul-surat"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div><div class="isi-surat"><table class="visum-table"><tr><td width="12%">Dasar</td><td width="3%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0;">M E M E R I N T A H K A N</p><table class="visum-table">{peg_rows}</table><table class="visum-table" style="margin-top:15px;"><tr><td width="12%">Untuk</td><td width="3%">:</td><td>{maksud} ke {tujuan}</td></tr></table></div>{ttd_layout}</div>'
+    html_out += f'<div class="kertas">{kop_pemda}<div class="judul-surat"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div><div class="isi-surat"><table class="visum-table"><tr><td width="12%">Dasar</td><td width="3%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:10px 0;">M E M E R I N T A H K A N</p><table class="visum-table">{peg_rows}</table><table class="visum-table" style="margin-top:10px;"><tr><td width="12%">Untuk</td><td width="3%">:</td><td>{maksud} ke {tujuan}</td></tr></table></div>{ttd_layout}</div>'
 
 # 2. SPD
 for p in daftar:
@@ -166,7 +166,7 @@ for p in daftar:
             <tr style="height: 160px;"><td>{rv("III.", "Tiba di", "", "")}</td><td style="padding:5px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
             <tr style="height: 160px;"><td>{rv("IV.", "Tiba di", "", "")}</td><td style="padding:5px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
             <tr style="height: 190px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:5px;"><p style="font-style:italic; font-size:9.5pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_v}</td></tr>
-        </table><div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div><div style="border:1pt solid black; border-top:none; padding:8px; font-size:9pt; text-align:justify; color:black; line-height:1.3;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div></div>'''
+        </table><div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div><div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.8pt; text-align:justify; color:black; line-height:1.3;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div></div>'''
 
 # 3. REGISTER
 if "Register" in opsi_cetak:
