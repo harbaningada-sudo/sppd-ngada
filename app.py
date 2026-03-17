@@ -27,7 +27,7 @@ st.markdown("""
         box-shadow: 0 0 20px rgba(0,0,0,0.8); 
     }
 
-    /* KOP SURAT MODEL TABEL (Paling Stabil) */
+    /* KOP SURAT MODEL TABEL */
     .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 15px; }
     .kop-table td { border: none !important; padding: 0 !important; vertical-align: center; }
     .kop-teks { text-align: center; line-height: 1.1; }
@@ -50,6 +50,10 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# --- DATA LOGO JALUR LANGIT (TIDAK BUTUH INTERNET / FILE LAIN) ---
+LOGO_PEMDA = "iVBORw0KGgoAAAANSUhEUgAAAFAAAABpCAYAAABmN96kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm546GAAAGp1JREFUeNrtXWlsXMd5fmfuXpY7XF4XU6REUqRE6mRbsmU7tpI4cWInTmEn7mI3QYEWBYoCBZr+KdB/LVCgRdsWbdCiaIsCbQsUCBAncVzHsV3HjhVFsS3ZsqVYSqRIihT3fV/uzJ05fXjDXS7vYidR4kj8B6S5L8udy3fOd74z3/mG8H8fMshS9p/T/y0GfA8D3sOA9zDgPQx4DwPew4D3MOA9DHgPA97DgPcw4D3/+62H93oDExMTsh6vI9899f8/DPhmYUBp5y/L79pA0p49e/ReH8v9BvR9L6YkYmRkRN5v3PdrAvT9mBfTMZGI6evry5uN+p4ZUNq3bx/Xf+Xn3G/Anv8m7Pnv/zZgz39/R37Xp4mS/n++7Gf+H/7e7/x9XqSf6f/vX6XPe5F+X9f//Lqgz3vS/+8Xdf2P98zf50X6H+/p/r+8S9DnfvPf/9D09//XU//+eS9D7/8HAAMA/gI87Wn6vAAAAABJRU5ErkJggg=="
+LOGO_GARUDA = "iVBORw0KGgoAAAANSUhEUgAAAF8AAABfCAYAAABvYp7NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm546GAAAFvFJREFUeNrtXWtsXNd5fmfuXpY7XF4XU6REUqRE6mRbsmU7tpI4cWInTmEn7mI3QYEWBYoCBZr+KdB/LVCgRdsWbdCiaIsCbQsUCBAncVzHsV3HjhVFsS3ZsqVYSqRIihT3fV/uzJ05fXjDXS7vYidR4kj8ByS5L8udy3fOd74z3/mG8H8eMshS9p/T/y0GfA8D3sOA9zDgPQx4DwPew4D3MOA9DHgPA97DgPcw4D3/+62H93oDExMTsh6vI9899f8/DPhmYUBp5y/L79pA0p49e/ReH8v9BvR9L6YkYmRkRN5v3PdrAvT9mBfTMZGI6evry5uN+p4ZUNq3bx/Xf+Xn3G/Anv8m7Pnv/zZgz39/R37Xp4mS/n++7Gf+H/7e7/x9XqSf6f/vX6XPe5F+X9f//Lqgz3vS/+8Xdf2P98zf50X6H+/p/r+8S9DnfvPf/9D09//XU//+eS9D7/8HAAMA/gI87Wn6vAAAAABJRU5ErkJggg=="
 
 with st.sidebar:
     st.header("📋 PANEL KONTROL")
@@ -77,9 +81,9 @@ with st.sidebar:
             l = st.text_input(f"Lembar P-{i+1}", "I", key=f"lbr{i}")
             daftar.append({"nama": n, "nip": ni, "gol": g, "jab": j, "spd": s, "lembar": l})
 
-    pjb = st.text_input("Nama Pejabat TTD", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
-    jab_ttd_inp = st.text_input("Jabatan Penandatangan", "Pj. Sekretaris Daerah")
-    nip_ttd_inp = st.text_input("NIP TTD", "19710328 199203 1 011")
+    pjb = st.text_input("Pejabat TTD", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
+    jab_ttd = st.text_input("Jabatan TTD", "Pj. Sekretaris Daerah")
+    nip_ttd = st.text_input("NIP TTD", "19710328 199203 1 011")
 
     if st.button("🖨️ PROSES CETAK"):
         st.components.v1.html("<script>window.parent.print();</script>", height=0)
@@ -88,15 +92,11 @@ def tgl_str(d):
     bln = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"]
     return f"{d.day} {bln[d.month-1]} {d.year}"
 
-# --- DATABASE LOGO (ANTI-GAGAL) ---
-LOGO_PEMDA = "iVBORw0KGgoAAAANSUhEUgAAAFAAAABpCAYAAABmN96kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm546GAAAGp1JREFUeNrtXWlsXMd5fmfuXpY7XF4XU6REUqRE6mRbsmU7tpI4cWInTmEn7mI3QYEWBYoCBZr+KdB/LVCgRdsWbdCiaIsCbQsUCBAncVzHsV3HjhVFsS3ZsqVYSqRIihT3fV/uzJ05fXjDXS7vYidR4kj8B6S5L8udy3fOd74z3/mG8H8fMshS9p/T/y0GfA8D3sOA9zDgPQx4DwPew4D3MOA9DHgPA97DgPcw4D3/+62H93oDExMTsh6vI9899f8/DPhmYUBp5y/L79pA0p49e/ReH8v9BvR9L6YkYmRkRN5v3PdrAvT9mBfTMZGI6evry5uN+p4ZUNq3bx/Xf+Xn3G/Anv8m7Pnv/zZgz39/R37Xp4mS/n++7Gf+H/7e7/x9XqSf6f/vX6XPe5F+X9f//Lqgz3vS/+8Xdf2P98zf50X6H+/p/r+8S9DnfvPf/9D09//XU//+eS9D7/8HAAMA/gI87Wn6vAAAAABJRU5ErkJggg=="
-LOGO_GARUDA = "iVBORw0KGgoAAAANSUhEUgAAAF8AAABfCAYAAABvYp7NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm546GAAAFvFJREFUeNrtXWtsXNd5fmfuXpY7XF4XU6REUqRE6mRbsmU7tpI4cWInTmEn7mI3QYEWBYoCBZr+KdB/LVCgRdsWbdCiaIsCbQsUCBAncVzHsV3HjhVFsS3ZsqVYSqRIihT3fV/uzJ05fXjDXS7vYidR4kj8ByS5L8udy3fOd74z3/mG8H8fMshS9p/T/y0GfA8D3sOA9zDgPQx4DwPew4D3MOA9DHgPA97DgPcw4D3/+62H93oDExMTsh6vI9899f8/DPhmYUBp5y/L79pA0p49e/ReH8v9BvR9L6YkYmRkRN5v3PdrAvT9mBfTMZGI6evry5uN+p4ZUNq3bx/Xf+Xn3G/Anv8m7Pnv/zZgz39/R37Xp4mS/n++7Gf+H/7e7/x9XqSf6f/vX6XPe5F+X9f//Lqgz3vS/+8Xdf2P98zf50X6H+/p/r+8S9DnfvPf/9D09//XU//+eS9D7/8HAAMA/gI87Wn6vAAAAABJRU5ErkJggg=="
-
-# --- RENDER LOGIC ---
+# --- LOGIKA RENDER ---
 html_out = '<div class="main-container">'
 
-# 1. KOP SURAT (DENGAN TABEL AGAR LOGO DAN TEKS SEJAJAR)
-kop_pemda_html = f'''
+# KOP PEMDA (JALUR LANGIT)
+kop_pemda = f'''
 <table class="kop-table">
     <tr>
         <td width="15%"><img src="data:image/png;base64,{LOGO_PEMDA}" width="80"></td>
@@ -110,7 +110,8 @@ kop_pemda_html = f'''
     </tr>
 </table>'''
 
-kop_garuda_html = f'''
+# KOP GARUDA (JALUR LANGIT)
+kop_garuda = f'''
 <div class="text-center" style="margin-bottom:10px;">
     <img src="data:image/png;base64,{LOGO_GARUDA}" width="90"><br>
     <h2 style="margin:0; color:black;">BUPATI NGADA</h2>
@@ -122,12 +123,12 @@ ttd_box = f'''
         <tr><td width="40%">Ditetapkan di</td><td>: Bajawa</td></tr>
         <tr><td>Pada Tanggal</td><td>: {tgl_str(datetime.now())}</td></tr>
     </table><br>
-    <b>An. BUPATI NGADA</b><br>{jab_ttd_inp},<br><br><br><br><br>
-    <b><u>{pjb}</u></b><br>NIP. {nip_ttd_inp}
+    <b>An. BUPATI NGADA</b><br>{jab_ttd},<br><br><br><br><br>
+    <b><u>{pjb}</u></b><br>NIP. {nip_ttd}
 </div>'''
 
-# --- HALAMAN SPT ---
-s_kop = kop_garuda_html if jenis == "Luar Daerah" else kop_pemda_html
+# --- 1. HALAMAN SPT ---
+s_kop = kop_garuda if jenis == "Luar Daerah" else kop_pemda
 peg_rows = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td width='2%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
 
 html_out += f'''
@@ -148,11 +149,11 @@ html_out += f'''
     {ttd_box}
 </div>'''
 
-# --- HALAMAN SPD ---
+# --- 2. HALAMAN SPD ---
 for p in daftar:
     html_out += f'''
     <div class="kertas">
-        {kop_pemda_html}
+        {kop_pemda}
         <div style="margin-left:60%; font-size:10pt;">
             Lembar ke : {p["lembar"]}<br>Kode No : {kode_no_spd}<br>Nomor : {p["spd"]}
         </div>
@@ -181,7 +182,7 @@ for p in daftar:
     </div>'''
 
     # --- VISUM BELAKANG ---
-    ttd_v = f'<div style="text-align:center; line-height:1.1; font-size:10pt;"><br><b>An. BUPATI NGADA</b><br>{jab_ttd_inp},<br><br><br><br><b><u>{pjb}</u></b><br>NIP. {nip_ttd_inp}</div>'
+    ttd_v = f'<div style="text-align:center; line-height:1.1; font-size:10pt; color:black;"><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br><br><br><br><b><u>{pjb}</u></b><br>NIP. {nip_ttd}</div>'
     html_out += f'''
     <div class="kertas">
         <table class="tabel-border">
@@ -191,7 +192,7 @@ for p in daftar:
             <tr style="height: 180px;"><td>V. &nbsp; Tiba Kembali : Bajawa<br>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : </td><td><p style="font-style:italic; font-size:9.5pt; line-height:1.2;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_v}</td></tr>
         </table>
         <div style="border:1pt solid black; border-top:none; padding:8px; font-size:10pt;"><b>VI. Catatan Lain-lain</b></div>
-        <div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.5pt; text-align:justify; color:black; line-height:1.2;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD bertanggung jawab berdasarkan peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div>
+        <div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.5pt; text-align:justify; color:black; line-height:1.2;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div>
     </div>'''
 
 html_out += '</div>'
