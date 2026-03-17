@@ -15,7 +15,7 @@ st.markdown("""
         display: flex; flex-direction: column; align-items: center; width: 100%; padding: 10px 0;
     }
 
-    /* KERTAS LEGAL (215.9mm x 355.6mm) */
+    /* KERTAS LEGAL */
     .kertas { 
         background-color: white !important; 
         width: 215.9mm; min-height: 355.6mm; 
@@ -25,18 +25,18 @@ st.markdown("""
     }
 
     /* KOP SURAT (Line Spacing 1.0 Rapat) */
-    .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 15px; }
+    .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 10px; }
     .kop-table td { border: none !important; padding: 0 !important; vertical-align: middle; }
     .kop-teks { text-align: center; line-height: 1.0 !important; }
     .kop-teks h3 { margin: 0; font-size: 13pt; font-weight: bold; line-height: 1.0; }
     .kop-teks h2 { margin: 0; font-size: 15pt; font-weight: bold; line-height: 1.0; padding: 2px 0; }
     .kop-teks p { margin: 0; font-size: 9pt; line-height: 1.0; }
 
-    /* TABEL SURAT BERGARIS (SPD Depan & Belakang) */
+    /* TABEL SPD BERGARIS */
     .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; }
     .tabel-border td { border: 1pt solid black !important; padding: 3px 6px !important; vertical-align: top; color: black !important; font-size: 10pt; }
     
-    /* TABEL POLOS (SPT) */
+    /* TABEL POLOS (SPT & VISUM) UNTUK LURUSKAN TITIK DUA */
     .tabel-polos { width: 100%; border-collapse: collapse; border: none !important; }
     .tabel-polos td { border: none !important; padding: 1px 0 !important; vertical-align: top; color: black !important; font-size: 10.5pt; line-height: 1.2; }
 
@@ -78,9 +78,9 @@ with st.sidebar:
             daftar.append({"nama": n, "nip": ni, "gol": g, "jab": j, "spd": s, "lembar": l})
 
     st.subheader("🖋️ PENANDATANGAN")
-    pjb = st.text_input("Nama Pejabat TTD", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
-    gol_ttd = st.text_input("Pangkat/Gol TTD", "Pembina Utama Muda - IV/c")
-    jab_ttd = st.text_input("Jabatan Penandatangan", "Pj. Sekretaris Daerah")
+    pjb = st.text_input("Pejabat TTD", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
+    gol_pjb = st.text_input("Pangkat/Gol TTD", "Pembina Utama Muda - IV/c")
+    jab_ttd = st.text_input("Jabatan TTD", "Pj. Sekretaris Daerah")
     nip_ttd = st.text_input("NIP TTD", "19710328 199203 1 011")
 
     if st.button("🖨️ PROSES CETAK"):
@@ -90,7 +90,7 @@ def tgl_str(d):
     bln = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"]
     return f"{d.day} {bln[d.month-1]} {d.year}"
 
-# --- LOGIKA KOP ---
+# --- KOP BUILDER ---
 kop_pemda = f'''
 <table class="kop-table">
     <tr>
@@ -111,22 +111,21 @@ kop_garuda = f'''
     <h2 style="margin:0; color:black; font-size:14pt; font-weight:bold;">BUPATI NGADA</h2>
 </div>'''
 
-# Tanda Tangan Global
-ttd_global = f'''
+ttd_box = f'''
 <div style="margin-left:55%; margin-top:20px; line-height:1.2; color:black; font-size:10.5pt;">
     <table class="tabel-polos">
-        <tr><td width="40%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr>
-        <tr><td>Pada Tanggal</td><td width="5%">:</td><td>{tgl_str(datetime.now())}</td></tr>
+        <tr><td width="35%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr>
+        <tr><td>Pada Tanggal</td><td>:</td><td>{tgl_str(datetime.now())}</td></tr>
     </table><br>
     <b>An. BUPATI NGADA</b><br>{jab_ttd},<br><br><br><br><br>
-    <b><u>{pjb}</u></b><br>{gol_ttd}<br>NIP. {nip_ttd}
+    <b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}
 </div>'''
 
 html_out = '<div class="main-container">'
 
-# 1. HALAMAN SPT (SESUAI GAMBAR 1)
+# 1. HALAMAN SPT (IDENTIK GAMBAR 1)
 s_kop = kop_garuda if jenis == "Luar Daerah" else kop_pemda
-peg_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='3%'>:</td><td width='4%'>{i+1}. Nama</td><td width='2%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
+peg_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='2%'>:</td><td width='3%'>{i+1}.</td><td width='15%'>Nama</td><td width='2%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
 
 html_out += f'''
 <div class="kertas">
@@ -135,21 +134,25 @@ html_out += f'''
         <h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3>
         <p>NOMOR : {no_spt}</p>
     </div>
-    <table class="tabel-polos" style="margin-top:15px;"><tr><td width="12%">Dasar</td><td width="3%">:</td><td>{anggaran}</td></tr></table>
+    <table class="tabel-polos" style="margin-top:15px;"><tr><td width="12%">Dasar</td><td width="2%">:</td><td>{anggaran}</td></tr></table>
     <p class="text-center text-bold" style="margin:15px 0; letter-spacing:2px;">M E M E R I N T A H K A N</p>
     <table class="tabel-polos">{peg_rows}</table>
-    <table class="tabel-polos" style="margin-top:15px;"><tr><td width="12%">Untuk</td><td width="3%">:</td><td>{maksud} ke {tujuan}</td></tr></table>
-    {ttd_global}
+    <table class="tabel-polos" style="margin-top:15px;"><tr><td width="12%">Untuk</td><td width="2%">:</td><td>{maksud} ke {tujuan}</td></tr></table>
+    {ttd_box}
 </div>'''
 
 # 2. HALAMAN SPD (DEPAN & BELAKANG)
 for p in daftar:
-    # --- DEPAN (SESUAI GAMBAR 2) ---
+    # --- DEPAN (IDENTIK GAMBAR 2) ---
     html_out += f'''
     <div class="kertas">
         {kop_pemda}
         <div style="margin-left:60%; font-size:10pt; line-height:1.1;">
-            Lembar ke &nbsp;&nbsp;: {p["lembar"]}<br>Kode No &nbsp;&nbsp;&nbsp;&nbsp;: {kode_no_spd}<br>Nomor &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {p["spd"]}
+            <table class="tabel-polos">
+                <tr><td width="40%">Lembar ke</td><td width="5%">:</td><td>{p["lembar"]}</td></tr>
+                <tr><td>Kode No</td><td>:</td><td>{kode_no_spd}</td></tr>
+                <tr><td>Nomor</td><td>:</td><td>{p["spd"]}</td></tr>
+            </table>
         </div>
         <h3 class="text-center text-bold underline" style="margin:5px 0 0 0;">SURAT PERJALANAN DINAS</h3>
         <h3 class="text-center text-bold" style="margin-bottom:10px;">(SPD)</h3>
@@ -173,22 +176,26 @@ for p in daftar:
             <tr><td>b. Mata Anggaran</td><td colspan="3"></td></tr>
             <tr><td>10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
         </table>
-        {ttd_global}
+        {ttd_box}
     </div>'''
 
-    # --- BELAKANG (SESUAI GAMBAR 3) ---
-    ttd_v = f'<div style="text-align:center; line-height:1.1; font-size:10pt;"><b>An. BUPATI NGADA</b><br>{jab_ttd},<br><br><br><br><b><u>{pjb}</u></b><br>{gol_ttd}<br>NIP. {nip_ttd}</div>'
+    # --- BELAKANG (IDENTIK GAMBAR 3 / TITIK DUA SEJAJAR) ---
+    ttd_v = f'<div style="text-align:center; line-height:1.2; font-size:10pt;"><b>An. BUPATI NGADA</b><br>{jab_ttd},<br><br><br><br><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'
+    
+    def baris_visum(label, isi):
+        return f'<tr><td width="35%">{label}</td><td width="5%">:</td><td>{isi}</td></tr>'
+
     html_out += f'''
     <div class="kertas">
         <table class="tabel-border">
-            <tr style="height: 180px;"><td width="50%"></td><td style="padding-top:10px;">I. &nbsp; Berangkat dari : Bajawa<br>&nbsp;&nbsp;&nbsp;Ke : {tujuan}<br>&nbsp;&nbsp;&nbsp;Pada Tanggal : {tgl_str(datetime.now())}<br>{ttd_v}</td></tr>
-            <tr style="height: 160px;"><td>II. &nbsp; Tiba di : {tujuan}<br>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : </td><td>&nbsp;&nbsp;&nbsp;&nbsp;Berangkat dari : {tujuan}<br>&nbsp;&nbsp;&nbsp;&nbsp;Ke : Bajawa<br>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : </td></tr>
-            <tr style="height: 155px;"><td>III. &nbsp; Tiba di : <br>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : </td><td>&nbsp;&nbsp;&nbsp;&nbsp;Berangkat dari : <br>&nbsp;&nbsp;&nbsp;&nbsp;Ke : <br>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : </td></tr>
-            <tr style="height: 155px;"><td>IV. &nbsp; Tiba di : <br>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : </td><td>&nbsp;&nbsp;&nbsp;&nbsp;Berangkat dari : <br>&nbsp;&nbsp;&nbsp;&nbsp;Ke : <br>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : </td></tr>
-            <tr style="height: 180px;"><td>V. &nbsp; Tiba Kembali : Bajawa<br>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : </td><td><p style="font-style:italic; font-size:9.5pt; margin-bottom:10px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_v}</td></tr>
+            <tr style="height: 180px;"><td width="50%"></td><td style="padding:10px;">I. <table class="tabel-polos">{baris_visum("Berangkat dari", "Bajawa")}{baris_visum("Ke", tujuan)}{baris_visum("Pada Tanggal", tgl_str(datetime.now()))}</table>{ttd_v}</td></tr>
+            <tr style="height: 160px;"><td>II. <table class="tabel-polos">{baris_visum("Tiba di", tujuan)}{baris_visum("Pada Tanggal", tgl_str(datetime.now()))}</table></td><td>&nbsp;&nbsp;&nbsp;&nbsp; <table class="tabel-polos">{baris_visum("Berangkat dari", tujuan)}{baris_visum("Ke", "Bajawa")}{baris_visum("Pada Tanggal", tgl_str(datetime.now()))}</table></td></tr>
+            <tr style="height: 155px;"><td>III. <table class="tabel-polos">{baris_visum("Tiba di", "")}{baris_visum("Pada Tanggal", "")}</table></td><td>&nbsp;&nbsp;&nbsp;&nbsp; <table class="tabel-polos">{baris_visum("Berangkat dari", "")}{baris_visum("Ke", "")}{baris_visum("Pada Tanggal", "")}</table></td></tr>
+            <tr style="height: 155px;"><td>IV. <table class="tabel-polos">{baris_visum("Tiba di", "")}{baris_visum("Pada Tanggal", "")}</table></td><td>&nbsp;&nbsp;&nbsp;&nbsp; <table class="tabel-polos">{baris_visum("Berangkat dari", "")}{baris_visum("Ke", "")}{baris_visum("Pada Tanggal", "")}</table></td></tr>
+            <tr style="height: 180px;"><td>V. <table class="tabel-polos">{baris_visum("Tiba Kembali", "Bajawa")}{baris_visum("Pada Tanggal", tgl_str(datetime.now()))}</table></td><td><p style="font-style:italic; font-size:9.5pt; margin-bottom:10px; line-height:1.2;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_v}</td></tr>
         </table>
         <div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div>
-        <div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.5pt; text-align:justify; color:black; line-height:1.2;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div>
+        <div style="border:1pt solid black; border-top:none; padding:8px; font-size:9pt; text-align:justify; color:black; line-height:1.2;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD bertanggung jawab berdasarkan peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div>
     </div>'''
 
 html_out += '</div>'
