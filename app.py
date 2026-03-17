@@ -32,19 +32,22 @@ st.markdown("""
         break-inside: avoid;
     }
 
-    /* POSISI HALAMAN BELAKANG (VISUM) */
-    .kertas-belakang { margin-top: 15mm !important; }
+    /* POSISI HALAMAN BELAKANG (VISUM) - DISESUAIKAN AGAR NAIK SEDIKIT */
+    .kertas-belakang { margin-top: 10mm !important; }
 
-    /* KOP SURAT (Line Spacing 1.0) */
+    /* KOP SURAT & JUDUL (Line Spacing 1.0 Rapat Sempurna) */
     .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 10px; }
     .kop-table td { border: none !important; padding: 0 !important; vertical-align: middle; }
     .kop-teks { text-align: center; line-height: 1.0 !important; } 
-    .kop-teks h3 { margin: 0; font-size: 14pt; font-weight: bold; line-height: 1.0; }
-    .kop-teks h2 { margin: 0; font-size: 16pt; font-weight: bold; line-height: 1.0; padding: 2px 0; }
-    .kop-teks p { margin: 0; font-size: 10pt; line-height: 1.0; }
+    .kop-teks h3, .kop-teks h2, .kop-teks p { margin: 0; line-height: 1.0 !important; padding: 1px 0; }
+    .kop-teks h3 { font-size: 14pt; font-weight: bold; }
+    .kop-teks h2 { font-size: 16pt; font-weight: bold; }
+    
+    .judul-surat { text-align: center; line-height: 1.0 !important; margin-top: 5px; }
+    .judul-surat h3, .judul-surat p { margin: 0; line-height: 1.0 !important; }
 
     /* ISI SURAT (Line Spacing 1.5) */
-    .isi-surat { line-height: 1.5 !important; }
+    .isi-surat { line-height: 1.5 !important; margin-top: 15px; }
 
     /* TABEL SPD & SEJAJARKAN NOMOR 1. */
     .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; table-layout: fixed; }
@@ -55,7 +58,7 @@ st.markdown("""
     .visum-table { width: 100%; border: none !important; border-collapse: collapse; margin: 0 !important; }
     .visum-table td { border: none !important; padding: 0 !important; font-size: 10.5pt; line-height: 1.2; color: black !important; vertical-align: top; }
 
-    /* SPACE TANDA TANGAN LEBAR */
+    /* SPACE TANDA TANGAN LEBAR UNTUK CAP */
     .space-ttd { height: 110px; } 
 
     .text-center { text-align: center; } .text-bold { font-weight: bold; } .underline { text-decoration: underline; }
@@ -65,7 +68,8 @@ st.markdown("""
         .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
         .kertas { 
             box-shadow: none !important; margin: 0 !important; width: 215.9mm !important; 
-            overflow: hidden;
+            transform: scale(1.02); /* Fit to sheet */
+            transform-origin: top center;
         }
         @page { size: legal; margin: 0; }
     }
@@ -124,12 +128,12 @@ html_out = '<div class="main-container">'
 # 1. SPT
 if "SPT" in opsi_cetak:
     peg_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='3%'>:</td><td width='4%'>{i+1}.</td><td width='25%'>Nama</td><td width='3%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
-    html_out += f'<div class="kertas">{kop_pemda}<div class="text-center" style="margin-top:5px;"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div><div class="isi-surat"><table class="visum-table" style="margin-top:15px;"><tr><td width="12%">Dasar</td><td width="3%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0;">M E M E R I N T A H K A N</p><table class="visum-table">{peg_rows}</table><table class="visum-table" style="margin-top:15px;"><tr><td width="12%">Untuk</td><td width="3%">:</td><td>{maksud} ke {tujuan}</td></tr></table></div>{ttd_layout}</div>'
+    html_out += f'<div class="kertas">{kop_pemda}<div class="judul-surat"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div><div class="isi-surat"><table class="visum-table"><tr><td width="12%">Dasar</td><td width="3%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0;">M E M E R I N T A H K A N</p><table class="visum-table">{peg_rows}</table><table class="visum-table" style="margin-top:15px;"><tr><td width="12%">Untuk</td><td width="3%">:</td><td>{maksud} ke {tujuan}</td></tr></table></div>{ttd_layout}</div>'
 
 # 2. SPD
 for p in daftar:
     if "SPD Depan" in opsi_cetak:
-        html_out += f'''<div class="kertas">{kop_pemda}<div style="margin-left:60%; line-height:1.1;"><table class="visum-table"><tr><td width="40%">Lembar ke</td><td width="5%">:</td><td>{p["lembar"]}</td></tr><tr><td>Kode No</td><td>:</td><td>{kode_spd}</td></tr><tr><td>Nomor</td><td>:</td><td>{p["spd"]}</td></tr></table></div><h3 class="text-center text-bold underline" style="margin-top:5px;">SURAT PERJALANAN DINAS</h3><h3 class="text-center text-bold" style="margin-bottom:10px;">(SPD)</h3><div class="isi-surat"><table class="tabel-border">
+        html_out += f'''<div class="kertas">{kop_pemda}<div style="margin-left:60%; line-height:1.1;"><table class="visum-table"><tr><td width="40%">Lembar ke</td><td width="5%">:</td><td>{p["lembar"]}</td></tr><tr><td>Kode No</td><td>:</td><td>{kode_spd}</td></tr><tr><td>Nomor</td><td>:</td><td>{p["spd"]}</td></tr></table></div><div class="judul-surat"><h3 class="text-bold underline">SURAT PERJALANAN DINAS</h3><h3 class="text-bold">(SPD)</h3></div><div class="isi-surat"><table class="tabel-border">
             <tr><td class="col-no">1.</td><td width="42%">Pejabat yang memberi perintah</td><td colspan="3"><b>BUPATI NGADA</b></td></tr>
             <tr><td class="col-no">2.</td><td>Nama Pegawai yang diperintahkan</td><td colspan="3"><b>{p['nama']}</b></td></tr>
             <tr><td class="col-no" rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p['gol']}</td></tr>
