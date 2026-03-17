@@ -5,7 +5,7 @@ import logo  # Memanggil file logo.py di repository kamu
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
 
-# CSS UNTUK UKURAN LEGAL & PRESISI NOMOR
+# CSS UNTUK UKURAN LEGAL, FIT SHEET, DAN MENGHILANGKAN HALAMAN KOSONG
 st.markdown("""
 <style>
     header, footer, #MainMenu { visibility: hidden; }
@@ -16,18 +16,22 @@ st.markdown("""
         display: flex; flex-direction: column; align-items: center; width: 100%; padding: 10px 0;
     }
 
-    /* KERTAS LEGAL (8.5 x 14 inci) */
+    /* KERTAS LEGAL */
     .kertas { 
         background-color: white !important; 
-        width: 215.9mm; min-height: 355.6mm; 
-        padding: 15mm 20mm; margin-bottom: 30px; 
-        color: black !important; font-family: Arial, sans-serif; 
-        box-sizing: border-box; box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        width: 215.9mm; 
+        min-height: 330mm; /* Diatur agar tidak memicu halaman kosong */
+        padding: 10mm 15mm; 
+        margin-bottom: 20px; 
+        color: black !important; 
+        font-family: Arial, sans-serif; 
+        box-sizing: border-box; 
+        box-shadow: 0 0 20px rgba(0,0,0,0.8);
         font-size: 11pt;
     }
 
-    /* KHUSUS HALAMAN BELAKANG TURUN JAUH */
-    .kertas-belakang { margin-top: 90mm !important; }
+    /* KHUSUS HALAMAN BELAKANG - DIATUR POSISINYA */
+    .kertas-belakang { margin-top: 20mm !important; }
 
     /* KOP SURAT (Line Spacing 1.0) */
     .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 10px; }
@@ -43,7 +47,7 @@ st.markdown("""
     /* TABEL SPD BERGARIS & SEJAJARKAN NOMOR 1. */
     .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; table-layout: fixed; }
     .tabel-border td { border: 1pt solid black !important; padding: 4px 6px !important; vertical-align: top; color: black !important; font-size: 10pt; }
-    .col-no { width: 30px; text-align: left; } /* Mengunci posisi nomor 1. */
+    .col-no { width: 30px !important; text-align: left !important; } /* Mengunci nomor 1. */
 
     /* TABEL VISUM */
     .visum-table { width: 100%; border: none !important; border-collapse: collapse; margin: 0 !important; }
@@ -55,10 +59,13 @@ st.markdown("""
         [data-testid="stSidebar"], .stButton { display: none !important; }
         .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
         .kertas { 
-            box-shadow: none !important; margin: 0 !important; width: 215.9mm !important; page-break-after: always;
-            transform: scale(1); /* Mencegah pengecilan otomatis */
+            box-shadow: none !important; 
+            margin: 0 !important; 
+            width: 215.9mm !important; 
+            page-break-after: always; /* Memaksa ganti halaman dengan bersih */
+            overflow: hidden;
         }
-        .kertas-belakang { margin-top: 85mm !important; } 
+        .kertas-belakang { margin-top: 15mm !important; } 
         @page { size: legal; margin: 0; }
     }
 </style>
@@ -93,7 +100,7 @@ with st.sidebar:
             g = st.text_input(f"Gol", "III/a", key=f"g{i}")
             j = st.text_input(f"Jabatan", "Pelaksana", key=f"j{i}")
             s = st.text_input(f"No SPD", f"530 /02/2026", key=f"spd{i}")
-            l = st.text_input(f"Lembar", "I", key=f"lbr{i}")
+            l = st.text_input(f"Lembar ke", "I", key=f"lbr{i}")
             daftar.append({"nama": n, "nip": ni, "gol": g, "jab": j, "spd": s, "lembar": l})
 
     st.subheader("🖋️ TANDA TANGAN")
@@ -149,11 +156,11 @@ for p in daftar:
 
         html_out += f'''<div class="kertas kertas-belakang"><table class="tabel-border">
             <tr style="height: 180px;"><td width="50%"></td><td style="padding:5px;">{rv("I.", "Berangkat dari", "Bajawa", tgl_bkt)}<table class="visum-table"><tr><td width="10%"></td><td width="35%">Ke</td><td width="3%">:</td><td>{tujuan}</td></tr></table>{ttd_v}</td></tr>
-            <tr style="height: 160px;"><td>{rv("II.", "Tiba di", tujuan, tgl_bkt)}</td><td style="padding:5px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="3%">:</td><td>Bajawa</td></tr></table></td></tr>
-            <tr style="height: 160px;"><td>{rv("III.", "Tiba di", "", "")}</td><td style="padding:5px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
-            <tr style="height: 160px;"><td>{rv("IV.", "Tiba di", "", "")}</td><td style="padding:5px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
+            <tr style="height: 155px;"><td>{rv("II.", "Tiba di", tujuan, tgl_bkt)}</td><td style="padding:5px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="3%">:</td><td>Bajawa</td></tr></table></td></tr>
+            <tr style="height: 150px;"><td>{rv("III.", "Tiba di", "", "")}</td><td style="padding:5px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
+            <tr style="height: 150px;"><td>{rv("IV.", "Tiba di", "", "")}</td><td style="padding:5px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
             <tr style="height: 180px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:5px;"><p style="font-style:italic; font-size:9.5pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_v}</td></tr>
-        </table><div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div><div style="border:1pt solid black; border-top:none; padding:8px; font-size:9pt; text-align:justify; color:black; line-height:1.2;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div></div>'''
+        </table><div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div><div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.8pt; text-align:justify; color:black; line-height:1.2;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div></div>'''
 
 # 3. REGISTER
 if "Register" in opsi_cetak:
