@@ -38,8 +38,8 @@ st.markdown("""
     .kop-teks { text-align: center; line-height: 1.0 !important; } 
     .kop-teks h3, .kop-teks h2, .kop-teks p { margin: 0; line-height: 1.0 !important; padding: 1px 0; }
     
-    .judul-surat { text-align: center; line-height: 1.0 !important; margin-top: 5px; }
-    .judul-surat h3, .judul-surat p { margin: 0; line-height: 1.0 !important; }
+    .judul-rapat { text-align: center; line-height: 1.0 !important; margin-bottom: 5px; }
+    .judul-rapat h3, .judul-rapat p { margin: 0; line-height: 1.0 !important; }
 
     /* ISI SURAT (Line Spacing 1.5) */
     .isi-surat { line-height: 1.5 !important; margin-top: 10px; }
@@ -49,7 +49,7 @@ st.markdown("""
     .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; table-layout: fixed; }
     .tabel-border td { border: 1pt solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; font-size: 10.5pt; }
     
-    /* KOLOM NOMOR SEJAJAR */
+    /* KOLOM NOMOR SEJAJAR (FIXED WIDTH) */
     .col-no { width: 35px !important; text-align: left !important; }
 
     /* TABEL VISUM */
@@ -57,7 +57,7 @@ st.markdown("""
     .visum-table td { border: none !important; padding: 0 !important; font-size: 10.5pt; line-height: 1.2; color: black !important; vertical-align: top; }
 
     /* SPACE TANDA TANGAN LEBAR */
-    .space-ttd { height: 125px; } 
+    .space-ttd { height: 130px; } 
 
     .text-center { text-align: center; } .text-bold { font-weight: bold; } .underline { text-decoration: underline; }
 
@@ -66,7 +66,7 @@ st.markdown("""
         .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
         .kertas { 
             box-shadow: none !important; margin: 0 !important; width: 215.9mm !important; 
-            transform: scale(1.01);
+            transform: scale(1.02);
             transform-origin: top center;
         }
         .kertas:last-child { page-break-after: avoid !important; }
@@ -117,21 +117,22 @@ with st.sidebar:
     if st.button("🖨️ PROSES CETAK"):
         st.components.v1.html("<script>setTimeout(function(){ window.parent.print(); }, 1200);</script>", height=0)
 
-# --- KOMPONEN ---
+# --- TEMPLATE ---
 kop_pemda = f'''<table class="kop-table"><tr><td width="15%"><img src="data:image/png;base64,{logo.PEMDA}" width="75"></td><td class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></td><td width="15%"></td></tr></table>'''
-ttd_layout = f'''<div style="margin-left:55%; margin-top:15px; line-height:1.3; color:black;"><table class="visum-table"><tr><td width="40%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr><tr><td>Pada Tanggal</td><td>:</td><td>{tgl_bkt}</td></tr></table><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div class="space-ttd"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'''
+
+ttd_box = f'''<div style="margin-left:55%; margin-top:15px; line-height:1.3; color:black;"><table class="visum-table"><tr><td width="40%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr><tr><td>Pada Tanggal</td><td>:</td><td>{tgl_bkt}</td></tr></table><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div class="space-ttd"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'''
 
 html_out = '<div class="main-container">'
 
 # 1. SPT
 if "SPT" in opsi_cetak:
-    peg_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='3%'>:</td><td width='4%'>{i+1}.</td><td width='25%'>Nama</td><td width='3%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
-    html_out += f'<div class="kertas">{kop_pemda}<div class="judul-surat"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div><div class="isi-surat"><table class="visum-table"><tr><td width="12%">Dasar</td><td width="3%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:10px 0;">M E M E R I N T A H K A N</p><table class="visum-table">{peg_rows}</table><table class="visum-table" style="margin-top:10px;"><tr><td width="12%">Untuk</td><td width="3%">:</td><td>{maksud} ke {tujuan}</td></tr></table></div>{ttd_layout}</div>'
+    p_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='4%'>:</td><td width='3%'>{i+1}.</td><td width='25%'>Nama</td><td width='3%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
+    html_out += f'<div class="kertas">{kop_pemda}<div class="judul-rapat"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div><div class="isi-surat"><table class="visum-table"><tr><td width="12%">Dasar</td><td width="4%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:10px 0;">M E M E R I N T A H K A N</p><table class="visum-table">{p_rows}</table><table class="visum-table" style="margin-top:10px;"><tr><td width="12%">Untuk</td><td width="4%">:</td><td>{maksud} ke {tujuan}</td></tr></table></div>{ttd_box}</div>'
 
 # 2. SPD
 for p in daftar:
     if "SPD Depan" in opsi_cetak:
-        html_out += f'''<div class="kertas">{kop_pemda}<div style="margin-left:60%; line-height:1.1;"><table class="visum-table"><tr><td width="40%">Lembar ke</td><td width="5%">:</td><td>{p["lembar"]}</td></tr><tr><td>Kode No</td><td>:</td><td>{kode_spd}</td></tr><tr><td>Nomor</td><td>:</td><td>{p["spd"]}</td></tr></table></div><div class="judul-surat"><h3 class="text-bold underline">SURAT PERJALANAN DINAS</h3><h3 class="text-bold">(SPD)</h3></div><div class="isi-surat"><table class="tabel-border">
+        html_out += f'''<div class="kertas">{kop_pemda}<div style="margin-left:60%; line-height:1.1;"><table class="visum-table"><tr><td width="40%">Lembar ke</td><td width="5%">:</td><td>{p["lembar"]}</td></tr><tr><td>Kode No</td><td>:</td><td>{kode_spd}</td></tr><tr><td>Nomor</td><td>:</td><td>{p["spd"]}</td></tr></table></div><div class="judul-rapat"><h3 class="text-bold underline">SURAT PERJALANAN DINAS</h3><h3 class="text-bold">(SPD)</h3></div><div class="isi-surat"><table class="tabel-border">
             <tr><td class="col-no">1.</td><td width="42%">Pejabat pemberi perintah</td><td colspan="3"><b>BUPATI NGADA</b></td></tr>
             <tr><td class="col-no">2.</td><td>Nama Pegawai yang diperintahkan</td><td colspan="3"><b>{p['nama']}</b></td></tr>
             <tr><td class="col-no" rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p['gol']}</td></tr>
@@ -150,7 +151,7 @@ for p in daftar:
             <tr><td>a. Instansi</td><td colspan="3">a. Bagian Perekonomian dan SDA</td></tr>
             <tr><td>b. Mata Anggaran</td><td colspan="3"></td></tr>
             <tr><td class="col-no">10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
-        </table></div>{ttd_layout}</div>'''
+        </table></div>{ttd_box}</div>'''
 
     if "SPD Belakang" in opsi_cetak:
         ttd_v = f'<div style="text-align:center; line-height:1.2; font-size:10.5pt;"><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div class="space-ttd"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'
@@ -166,7 +167,6 @@ for p in daftar:
             <tr style="height: 190px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:5px;"><p style="font-style:italic; font-size:9.5pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_v}</td></tr>
         </table><div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div><div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.8pt; text-align:justify; color:black; line-height:1.3;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.</div></div>'''
 
-# 3. REGISTER
 if "Register" in opsi_cetak:
     r_rows = "".join([f"<tr><td class='text-center'>{i+1}</td><td>{p['nama']}</td><td>{no_spt}</td><td>{p['spd']}</td><td>{tgl_bkt}</td><td>{tujuan}</td></tr>" for i, p in enumerate(daftar)])
     html_out += f'''<div class="kertas"><h3 class="text-center text-bold">REGISTER SURAT PERJALANAN DINAS</h3><br><table class="tabel-border"><thead><tr style="background:#eee;"><th>No</th><th>Nama Pegawai</th><th>No SPT</th><th>No SPD</th><th>Tgl Bkt</th><th>Tujuan</th></tr></thead><tbody>{r_rows}</tbody></table></div>'''
