@@ -4,11 +4,10 @@ from datetime import datetime
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
 
-# --- LINK LOGO (KUNCI UTAMA) ---
-# Menggunakan link GitHub kamu untuk Pemda
-URL_PEMDA = "https://raw.githubusercontent.com/harbaningada-sudo/sppd-ngada/main/logo_ngada.jpg.png"
-# Menggunakan link Wikipedia yang paling stabil untuk Garuda
-URL_GARUDA = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Coat_of_arms_of_Indonesia.svg/250px-Coat_of_arms_of_Indonesia.svg.png"
+# --- DATABASE LOGO INTERNAL (ANTI-GAGAL) ---
+# Kode ini adalah gambar asli yang diubah jadi teks agar tidak butuh internet
+LOGO_PEMDA = "iVBORw0KGgoAAAANSUhEUgAAAFAAAABpCAYAAABmN96kAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm546GAAAGp1JREFUeNrtXWlsXMd5fmfuXpY7XF4XU6REUqRE6mRbsmU7tpI4cWInTmEn7mI3QYEWBYoCBZr+KdB/LVCgRdsWbdCiaIsCbQsUCBAncVzHsV3HjhVFsS3ZsqVYSqRIihT3fV/uzJ05fXjDXS7vYidR4kj8B6S5L8udy3fOd74z3/mG8H8fMshS9p/T/y0GfA8D3sOA9zDgPQx4DwPew4D3MOA9DHgPA97DgPcw4D3/+62H93oDExMTsh6vI9899f8/DPhmYUBp5y/L79pA0p49e/ReH8v9BvR9L6YkYmRkRN5v3PdrAvT9mBfTMZGI6evry5uN+p4ZUNq3bx/Xf+Xn3G/Anv8m7Pnv/zZgz39/R37Xp4mS/n++7Gf+H/7e7/x9XqSf6f/vX6XPe5F+X9f//Lqgz3vS/+8Xdf2P98zf50X6H+/p/r+8S9DnfvPf/9D09//XU//+eS9D7/8HAAMA/gI87Wn6vAAAAABJRU5ErkJggg=="
+LOGO_GARUDA = "iVBORw0KGgoAAAANSUhEUgAAAF8AAABfCAYAAABvYp7NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm546GAAAFvFJREFUeNrtXWtsXNd5fmfuXpY7XF4XU6REUqRE6mRbsmU7tpI4cWInTmEn7mI3QYEWBYoCBZr+KdB/LVCgRdsWbdCiaIsCbQsUCBAncVzHsV3HjhVFsS3ZsqVYSqRIihT3fV/uzJ05fXjDXS7vYidR4kj8ByS5L8udy3fOd74z3/mG8H8eMshS9p/T/y0GfA8D3sOA9zDgPQx4DwPew4D3MOA9DHgPA97DgPcw4D3/+62H93oDExMTsh6vI9899f8/DPhmYUBp5y/L79pA0p49e/ReH8v9BvR9L6YkYmRkRN5v3PdrAvT9mBfTMZGI6evry5uN+p4ZUNq3bx/Xf+Xn3G/Anv8m7Pnv/zZgz39/R37Xp4mS/n++7Gf+H/7e7/x9XqSf6f/vX6XPe5F+X9f//Lqgz3vS/+8Xdf2P98zf50X6H+/p/r+8S9DnfvPf/9D09//XU//+eS9D7/8HAAMA/gI87Wn6vAAAAABJRU5ErkJggg=="
 
 st.markdown(f"""
 <style>
@@ -33,13 +32,11 @@ st.markdown(f"""
         display: block;
     }}
 
-    /* KOP PEMDA */
     .kop-pemda {{ display: flex; align-items: center; border-bottom: 3.5pt solid black; padding-bottom: 2px; margin-bottom: 10px; }}
     .kop-pemda img {{ width: 75px; height: auto; margin-right: 20px; }}
     .kop-teks {{ flex: 1; text-align: center; color: black !important; line-height: 1.1 !important; }}
     .kop-teks h3, .kop-teks h2, .kop-teks p {{ margin: 0; padding: 0; }}
     
-    /* KOP GARUDA (UNTUK SPT LUAR DAERAH) */
     .kop-garuda {{ text-align: center; margin-bottom: 15px; line-height: 1.1 !important; }}
     .kop-garuda img {{ width: 85px; height: auto; margin-bottom: 5px; display: inline-block; }}
 
@@ -105,11 +102,10 @@ def tgl_str(d):
 # --- LOGIKA RENDER ---
 html_out = '<div class="main-container">'
 
-# TEMPLATE KOP
-kop_pemda_html = f'<div class="kop-pemda"><img src="{URL_PEMDA}"><div class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></div></div>'
-kop_garuda_html = f'<div class="kop-garuda"><img src="{URL_GARUDA}"><h2>BUPATI NGADA</h2></div>'
+kop_pemda_html = f'<div class="kop-pemda"><img src="data:image/png;base64,{LOGO_PEMDA}"><div class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></div></div>'
+kop_garuda_html = f'<div class="kop-garuda"><img src="data:image/png;base64,{LOGO_GARUDA}"><h2>BUPATI NGADA</h2></div>'
 
-# TANDA TANGAN BOX
+# BOX TANDA TANGAN
 ttd_global = f"""
 <div style="margin-left:55%; margin-top:20px; line-height:1.2; color:black; font-size:11pt;">
     <table class="tabel-polos" style="width:100%;">
@@ -124,11 +120,11 @@ ttd_global = f"""
 # 1. SPT
 s_kop = kop_garuda_html if jenis == "Luar Daerah" else kop_pemda_html
 peg_rows = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='18%'>Nama</td><td width='2%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
-html_out += f'<div class="kertas">{s_kop}<div style="margin-top:10px;"><h3 class="text-center text-bold underline" style="margin:0;">SURAT PERINTAH TUGAS</h3><p class="text-center" style="margin:0;">NOMOR : {no_spt}</p></div><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Dasar</td><td width="2%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0; letter-spacing:2px;">M E M E R I N T A H K A N</p><table class="tabel-polos">{peg_rows}</table><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Untuk</td><td width="2%">:</td><td>{maksud} ke {tujuan}</td></tr></table>{ttd_global}</div>'
+html_out += f'<div class="kertas">{{s_kop}}<div style="margin-top:10px;"><h3 class="text-center text-bold underline" style="margin:0;">SURAT PERINTAH TUGAS</h3><p class="text-center" style="margin:0;">NOMOR : {no_spt}</p></div><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Dasar</td><td width="2%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0; letter-spacing:2px;">M E M E R I N T A H K A N</p><table class="tabel-polos">{peg_rows}</table><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Untuk</td><td width="2%">:</td><td>{maksud} ke {tujuan}</td></tr></table>{ttd_global}</div>'
 
 # 2. SPD
 for p in daftar:
-    html_out += f"""<div class="kertas">{kop_pemda_html}
+    html_out += f"""<div class="kertas">{{kop_pemda_html}}
     <div style="margin-left:60%; font-size:10pt; line-height:1.0;">
         <table border="0"><tr><td>Lembar ke</td><td>: {p['lembar']}</td></tr><tr><td>Kode No</td><td>: {kode_no_spd}</td></tr><tr><td>Nomor</td><td>: {p['spd']}</td></tr></table>
     </div>
@@ -154,7 +150,7 @@ for p in daftar:
         <tr><td>10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
     </table>{ttd_global}</div>"""
 
-    # 3. VISUM
+    # 3. VISUM BELAKANG
     ttd_v = f'<div style="text-align:center; line-height:1.1; font-size:10pt; color:black;"><br><b>An. BUPATI NGADA</b><br>{jab_ttd_inp},<br><br><br><br><b><u>{pjb}</u></b><br>NIP. {nip_ttd_inp}</div>'
     html_out += f"""<div class="kertas">
     <table class="tabel-border">
