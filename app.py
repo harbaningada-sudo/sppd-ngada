@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import datetime
-import logo  # <--- Ini untuk memanggil file logo.py yang baru saja dibuat
+import logo # Memanggil file logo.py
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
@@ -15,7 +15,6 @@ st.markdown("""
         display: flex; flex-direction: column; align-items: center; width: 100%; padding: 10px 0;
     }
 
-    /* KERTAS LEGAL (215.9mm x 355.6mm) */
     .kertas { 
         background-color: white !important; 
         width: 215.9mm; 
@@ -29,7 +28,6 @@ st.markdown("""
         display: block;
     }
 
-    /* KOP SURAT (Line Spacing 1.0) */
     .kop-pemda { display: flex; align-items: center; border-bottom: 3.5pt solid black; padding-bottom: 2px; margin-bottom: 10px; }
     .kop-pemda img { width: 75px; height: auto; margin-right: 20px; display: block; }
     .kop-teks { flex: 1; text-align: center; color: black !important; line-height: 1.0 !important; }
@@ -38,7 +36,6 @@ st.markdown("""
     .kop-garuda { text-align: center; margin-bottom: 10px; line-height: 1.0 !important; }
     .kop-garuda img { width: 85px; height: auto; margin-bottom: 5px; display: inline-block; }
 
-    /* TABEL SPD */
     .tabel-border { 
         width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; table-layout: fixed;
     }
@@ -60,6 +57,14 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# AMBIL DATA DARI LOGO.PY DAN BERSIHKAN SPASI
+try:
+    data_pemda = logo.PEMDA.strip()
+    data_garuda = logo.GARUDA.strip()
+except:
+    data_pemda = ""
+    data_garuda = ""
 
 with st.sidebar:
     st.header("📋 PANEL KONTROL")
@@ -100,21 +105,19 @@ def tgl_str(d):
     bln = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"]
     return f"{d.day} {bln[d.month-1]} {d.year}"
 
-# --- RENDER LOGIC ---
+# --- LOGIKA RENDER ---
 html_out = '<div class="main-container">'
 
-# KOP PANGGIL DARI logo.py
-# PERHATIKAN: logo.PEMDA dan logo.GARUDA memanggil variabel di file logo.py
-kop_pemda_html = f'<div class="kop-pemda"><img src="data:image/png;base64,{logo.PEMDA}"><div class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></div></div>'
-kop_garuda_html = f'<div class="kop-garuda"><img src="data:image/png;base64,{logo.GARUDA}"><h2>BUPATI NGADA</h2></div>'
+kop_pemda_html = f'<div class="kop-pemda"><img src="data:image/png;base64,{data_pemda}"><div class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></div></div>'
+kop_garuda_html = f'<div class="kop-garuda"><img src="data:image/png;base64,{data_garuda}"><h2>BUPATI NGADA</h2></div>'
 ttd_global = f'<div style="margin-left:55%; margin-top:20px; line-height:1.2; color:black; font-size:11pt;"><table class="tabel-polos" style="width:100%;"><tr><td width="40%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr><tr><td>Pada Tanggal</td><td>:</td><td>{tgl_str(datetime.now())}</td></tr></table><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br><br><br><br><br><b><u>{pjb}</u></b><br>NIP. {nip_p}</div>'
 
-# SPT
+# --- A. SPT ---
 s_kop = kop_garuda_html if jenis == "Luar Daerah" else kop_pemda_html
 rows_pegawai = "".join([f"<tr><td width='15%'>{'Kepada' if i==0 else ''}</td><td width='5%'>{i+1}.</td><td width='15%'>Nama</td><td width='2%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr>" for i, p in enumerate(daftar)])
 html_out += f'<div class="kertas">{s_kop}<h3 class="text-center text-bold underline" style="margin:10px 0 0 0;">SURAT PERINTAH TUGAS</h3><p class="text-center" style="margin:0;">NOMOR : {no_spt}</p><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Dasar</td><td width="2%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:15px 0;">M E M E R I N T A H K A N</p><table class="tabel-polos">{rows_pegawai}</table><table class="tabel-polos" style="margin-top:15px;"><tr><td width="15%">Untuk</td><td width="2%">:</td><td>{maksud} ke {tujuan}</td></tr></table>{ttd_global}</div>'
 
-# SPD
+# --- B. SPD ---
 for p in daftar:
     html_out += f"""<div class="kertas">{kop_pemda_html}
     <div style="margin-left:60%; font-size:10pt; line-height:1.0;">
@@ -147,7 +150,7 @@ for p in daftar:
         <tr><td>10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
     </table>{ttd_global}</div>"""
 
-    # BELAKANG (I-VII)
+    # BELAKANG
     ttd_v = f"""<div style="text-align:center; line-height:1.1; font-size:10pt; color:black;"><br><b>An. BUPATI NGADA</b><br>{jab_ttd},<br><br><br><br><b><u>{pjb}</u></b><br>NIP. {nip_p}</div>"""
     html_out += f"""<div class="kertas">
     <table class="tabel-border">
@@ -160,7 +163,7 @@ for p in daftar:
     <div style="border:1pt solid black; border-top:none; padding:8px; font-size:10pt;"><b>VI. Catatan Lain-lain</b></div>
     <div style="border:1pt solid black; border-top:none; padding:8px; font-size:9pt; text-align:justify; color:black; line-height:1.2;">
         <b>VII. Perhatian :</b><br>
-        Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.
+        Pejabat yang menerbitkan SPD bertanggung jawab berdasarkan peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.
     </div></div>"""
 
 html_out += '</div>'
