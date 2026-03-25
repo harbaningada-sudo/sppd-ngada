@@ -24,6 +24,7 @@ st.markdown("""
         font-family: Arial, sans-serif; box-sizing: border-box; box-shadow: 0 0 20px rgba(0,0,0,0.8);
         font-size: 10.5pt; page-break-after: always; overflow: hidden; position: relative;
     }
+
     .kertas-landscape { width: 355.6mm !important; height: 215.9mm !important; padding: 15mm !important; }
 
     .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 5px; }
@@ -161,11 +162,11 @@ if tab_menu == "Input & Cetak":
                 <tr><td class="col-no">10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
             </table><div style="margin-left:55%;">{get_ttd_statis(pjb, gol_pjb, nip_ttd, 65)}</div></div>'''
 
-    # 3. SPD BELAKANG
+    # 3. SPD BELAKANG (VISUM)
     if "SPD Belakang" in opsi_cetak:
         ttd_asal = get_ttd_statis(pjb, gol_pjb, nip_ttd, 65)
         
-        # TTD TUJUAN (Jika Luar Daerah)
+        # TTD TUJUAN (Hanya muncul jika jenis_spd == "Luar Daerah")
         if jenis_spd == "Luar Daerah":
             ttd_tujuan = f'''<div style="text-align:center; line-height:1.2; font-size:10pt;"><br><b>Mengesahkan</b><br>{instansi_tujuan}<div style="height:65px;"></div><b><u>{pjb_tujuan}</u></b><br>{gol_tujuan}<br>NIP. {nip_tujuan}</div>'''
         else:
@@ -177,7 +178,7 @@ if tab_menu == "Input & Cetak":
 
         html_out += f'''<div class="kertas"><table class="tabel-border" style="height:88%;">
             <tr style="height: 220px;"><td width="50%"></td><td style="padding:10px;">{rv("I.", "Berangkat dari", "Bajawa", tgl_bkt)}<table class="visum-table"><tr><td width="10%"></td><td width="35%">Ke</td><td width="5%">:</td><td>{tujuan}</td></tr></table>{ttd_asal}</td></tr>
-            <tr style="height: 190px;"><td>{rv("II.", "Tiba di", tujuan, tgl_bkt)}<br></td><td style="padding:10px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="5%">:</td><td>Bajawa</td></tr></table>{ttd_tujuan}</td></tr>
+            <tr style="height: 190px;"><td>{rv("II.", "Tiba di", tujuan, tgl_bkt)}</td><td style="padding:10px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="5%">:</td><td>Bajawa</td></tr></table>{ttd_tujuan}</td></tr>
             <tr style="height: 190px;"><td>{rv("III.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
             <tr style="height: 190px;"><td>{rv("IV.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
             <tr style="height: 220px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9.2pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_asal}</td></tr>
@@ -188,6 +189,7 @@ if tab_menu == "Input & Cetak":
             Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.
         </div></div>'''
 
+    # 4. REGISTER
     if "Register" in opsi_cetak:
         r_rows = "".join([f"<tr><td class='text-center'>{i+1}</td><td>{r['Nama']}</td><td>{r['No SPT']}</td><td>{r['No SPD']}</td><td>{r['Berangkat']}</td><td>{r['Pulang']}</td><td>{r['Lama']}</td><td>-</td></tr>" for i, r in enumerate(st.session_state.arsip_register)])
         html_out += f'''<div class="kertas kertas-landscape register-page"><h3 class="text-center text-bold">REGISTER SURAT PERJALANAN DINAS</h3><br><table class="tabel-border" style="font-size:9pt; width:100%;"><thead><tr style="background:#eee;"><th>No</th><th>Nama Pegawai</th><th>Nomor SPT</th><th>Nomor SPD</th><th>Tgl Bkt</th><th>Tgl Kbl</th><th>Lamanya</th><th>Ket</th></tr></thead><tbody>{r_rows}</tbody></table></div>'''
