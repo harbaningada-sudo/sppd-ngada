@@ -160,7 +160,7 @@ if tab_menu == "Input & Cetak":
     if "SPT" in opsi_cetak:
         p_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='5%'>:</td><td width='5%'>{i+1}.</td><td width='20%'>Nama</td><td width='5%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
         
-        # PERBAIKAN: Jarak padding-top pada isi 'Untuk' agar teks turun sedikit sesuai gambar
+        # PERBAIKAN: Menambahkan baris kosong (spacer) antara Kepada dan Untuk
         html_out += f'''
         <div class="kertas">
             {kop_pemda}
@@ -170,13 +170,16 @@ if tab_menu == "Input & Cetak":
             </div>
             <div class="isi-surat-spt">
                 <table class="visum-table"><tr><td width="12%">Dasar</td><td width="5%">:</td><td>{anggaran}</td></tr></table>
-                <p class="text-center text-bold" style="margin:10px 0;">M E M E R I N T A H K A N</p>
+                <p class="text-center text-bold" style="margin:10px 0; letter-spacing: 2px;">M E M E R I N T A H K A N</p>
                 <table class="visum-table">{p_rows}</table>
-                <table class="visum-table" style="margin-top:5px;"> 
+                
+                <div style="height: 25px;"></div> 
+
+                <table class="visum-table"> 
                     <tr>
-                        <td width="12%" style="padding-top:20px;">Untuk</td>
-                        <td width="5%" style="padding-top:20px;">:</td>
-                        <td style="padding-top:20px;">{maksud} ke {tujuan}</td>
+                        <td width="12%">Untuk</td>
+                        <td width="5%">:</td>
+                        <td>{maksud} ke {tujuan}</td>
                     </tr>
                 </table>
             </div>
