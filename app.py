@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import logo  # Pastikan variabel GARUDA dan PEMDA ada di file logo.py
+import logo  # Memanggil file logo.py di repository kamu
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
@@ -78,14 +78,13 @@ with st.sidebar:
             daftar = []
             for i in range(st.session_state.jml):
                 st.markdown(f"**Pegawai {i+1}**")
-                daftar.append({
-                    "nama": st.text_input(f"Nama P-{i+1}", f"Nama {i+1}", key=f"n{i}"),
-                    "nip": st.text_input(f"NIP P-{i+1}", "19XXXXXXXXXXXXXX", key=f"nip{i}"),
-                    "gol": st.text_input(f"Gol P-{i+1}", "III/a", key=f"g{i}"),
-                    "jab": st.text_input(f"Jabatan P-{i+1}", "Pelaksana", key=f"j{i}"),
-                    "spd": st.text_input(f"No SPD P-{i+1}", f"530 /02/2026", key=f"spd{i}"),
-                    "lembar": st.text_input(f"Lembar ke P-{i+1}", "I", key=f"lbr{i}")
-                })
+                n = st.text_input(f"Nama", f"Nama {i+1}", key=f"n{i}")
+                ni = st.text_input(f"NIP", "19XXXXXXXXXXXXXX", key=f"nip{i}")
+                g = st.text_input(f"Gol", "III/a", key=f"g{i}")
+                j = st.text_input(f"Jabatan", "Pelaksana", key=f"j{i}")
+                s = st.text_input(f"No SPD", f"530 /02/2026", key=f"spd{i}")
+                l = st.text_input(f"Lembar ke", "I", key=f"lbr{i}")
+                daftar.append({"nama": n, "nip": ni, "gol": g, "jab": j, "spd": s, "lembar": l})
 
         with st.expander("📄 DATA UTAMA"):
             no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
@@ -96,6 +95,7 @@ with st.sidebar:
             lama = st.text_input("Lama Hari", "1 (Satu) hari")
             tgl_bkt = st.text_input("Tanggal Berangkat", "17 Maret 2026")
             tgl_kbl = st.text_input("Tanggal Pulang", "17 Maret 2026")
+            ket_reg = st.text_input("Keterangan Register", "-")
             anggaran = st.text_input("Dasar Anggaran", "DPA Bagian Perekonomian dan SDA Setda Ngada 2026")
 
         if jenis_perjalanan == "Luar Daerah":
@@ -106,7 +106,6 @@ with st.sidebar:
                 nip_tujuan = st.text_input("NIP Pejabat Tujuan", "19XXXXXXXXXXXXXX")
 
         st.subheader("🖋️ TANDA TANGAN ASAL")
-        ttd_label = st.selectbox("Label TTD SPT", ["BUPATI NGADA", "WAKIL BUPATI NGADA", "An. BUPATI NGADA"])
         pjb = st.text_input("Nama Pejabat", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
         gol_pjb = st.text_input("Pangkat/Gol", "Pembina Utama Muda - IV/c")
         jab_ttd = st.text_input("Jabatan Utama", "Pj. Sekretaris Daerah")
@@ -117,13 +116,24 @@ with st.sidebar:
             for p in daftar:
                 st.session_state.arsip_register.append({
                     "Nama": p['nama'], "No SPT": no_spt, "No SPD": p['spd'],
-                    "Berangkat": tgl_bkt, "Pulang": tgl_kbl, "Lama": lama, "Ket": jenis_perjalanan
+                    "Berangkat": tgl_bkt, "Pulang": tgl_kbl, "Lama": lama, "Ket": ket_reg
                 })
             st.components.v1.html("<script>setTimeout(function(){ window.parent.print(); }, 1200);</script>", height=0)
 
+    elif tab_menu == "Kelola Register":
+        st.subheader("📂 RIWAYAT INPUT REGISTER")
+        if st.session_state.arsip_register:
+            df_reg = pd.DataFrame(st.session_state.arsip_register)
+            st.dataframe(df_reg, use_container_width=True)
+            idx_hapus = st.number_input("Pilih Nomor Indeks untuk dihapus", min_value=0, max_value=len(df_reg)-1, step=1)
+            if st.button("🗑️ Hapus Baris Terpilih"):
+                st.session_state.arsip_register.pop(idx_hapus)
+                st.rerun()
+        else: st.info("Kosong.")
+
 # --- TEMPLATE KOMPONEN ---
 def get_ttd_statis(nama, gol, nip, space):
-    return f'''<div style="text-align:center; line-height:1.2; font-size:10pt;"><b>{ttd_label}</b><br>{f"{jab_ttd}," if ttd_label=="An. BUPATI NGADA" else ""}<br>{f"Ub. {ub}," if ub else ""}<div style="height:{space}px;"></div><b><u>{nama}</u></b><br>{gol}<br>NIP. {nip}</div>'''
+    return f'''<div style="text-align:center; line-height:1.2; font-size:10pt;"><b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div style="height:{space}px;"></div><b><u>{nama}</u></b><br>{gol}<br>NIP. {nip}</div>'''
 
 html_out = '<div class="main-container">'
 
@@ -131,28 +141,12 @@ if tab_menu == "Input & Cetak":
     # 1. SPT (LOGIKA KOP KHUSUS LUAR DAERAH)
     if "SPT" in opsi_cetak:
         if jenis_perjalanan == "Luar Daerah":
-            # Pakai Logo Garuda sesuai gambar
             kop_spt = f'<div class="kop-garuda"><img src="data:image/png;base64,{logo.GARUDA}"><h2>BUPATI NGADA</h2></div>'
         else:
             kop_spt = f'''<table class="kop-table"><tr><td width="15%"><img src="data:image/png;base64,{logo.PEMDA}" width="75"></td><td class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></td><td width="15%"></td></tr></table>'''
         
         p_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='5%'>:</td><td width='5%'>{i+1}.</td><td width='20%'>Nama</td><td width='5%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
-        html_out += f'''<div class="kertas">{kop_spt}
-            <div class="judul-rapat"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div>
-            <div class="isi-surat-spt">
-                <table class="visum-table"><tr><td width="12%">Dasar</td><td width="5%">:</td><td>{anggaran}</td></tr></table>
-                <p class="text-center text-bold" style="margin:10px 0; letter-spacing:4px;">M E M E R I N T A H K A N</p>
-                <table class="visum-table">{p_rows}</table>
-                <table class="visum-table" style="margin-top:10px;"><tr><td width="12%">Untuk</td><td width="5%">:</td><td>{maksud} ke {tujuan}</td></tr></table>
-            </div>
-            <div style="margin-left:55%; margin-top:20px;">
-                <table class="visum-table">
-                    <tr><td width="40%">Ditetapkan di</td><td width="5%">:</td><td>Bajawa</td></tr>
-                    <tr><td>Pada Tanggal</td><td>:</td><td>{datetime.now().strftime('%d %B %Y')}</td></tr>
-                </table>
-                {get_ttd_statis(pjb, gol_pjb, nip_ttd, 85)}
-            </div>
-        </div>'''
+        html_out += f'<div class="kertas">{kop_spt}<div class="judul-rapat"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div><div class="isi-surat-spt"><table class="visum-table"><tr><td width="12%">Dasar</td><td width="5%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:10px 0;">M E M E R I N T A H K A N</p><table class="visum-table">{p_rows}</table><table class="visum-table" style="margin-top:10px;"><tr><td width="12%">Untuk</td><td width="5%">:</td><td>{maksud} ke {tujuan}</td></tr></table></div><div style="margin-left:55%;">{get_ttd_statis(pjb, gol_pjb, nip_ttd, 80)}</div></div>'
 
     # 2. SPD DEPAN
     kop_pemda = f'''<table class="kop-table"><tr><td width="15%"><img src="data:image/png;base64,{logo.PEMDA}" width="75"></td><td class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p class="text-bold">BAJAWA</p></td><td width="15%"></td></tr></table>'''
@@ -163,7 +157,7 @@ if tab_menu == "Input & Cetak":
                 <tr><td class="col-no">2.</td><td>Nama Pegawai diperintah</td><td colspan="3"><b>{p['nama']}</b></td></tr>
                 <tr><td class="col-no" rowspan="3">3.</td><td>a. Pangkat/Golongan</td><td colspan="3">{p['gol']}</td></tr>
                 <tr><td>b. Jabatan</td><td colspan="3">{p['jab']}</td></tr>
-                <tr><td>c. Tingkat Menurut Peraturan</td><td colspan="3">-</td></tr>
+                <tr><td>c. Tingkat Menurut Peraturan</td><td colspan="3"></td></tr>
                 <tr><td class="col-no">4.</td><td>Maksud Perjalanan Dinas</td><td colspan="3">{maksud}</td></tr>
                 <tr><td class="col-no">5.</td><td>Alat angkut</td><td colspan="3">{alat}</td></tr>
                 <tr><td class="col-no" rowspan="2">6.</td><td>a. Tempat Berangkat</td><td colspan="3">Bajawa</td></tr>
@@ -171,10 +165,10 @@ if tab_menu == "Input & Cetak":
                 <tr><td class="col-no" rowspan="3">7.</td><td>Lamanya Perjalanan Dinas</td><td colspan="3">{lama}</td></tr>
                 <tr><td>a. Tanggal Berangkat</td><td colspan="3">{tgl_bkt}</td></tr>
                 <tr><td>b. Tanggal Harus Kembali</td><td colspan="3">{tgl_kbl}</td></tr>
-                <tr><td class="col-no">10.</td><td>Keterangan lain-lain</td><td colspan="3">-</td></tr>
-            </table><div style="margin-left:55%; margin-top:10px;">{get_ttd_statis(pjb, gol_pjb, nip_ttd, 65)}</div></div>'''
+                <tr><td class="col-no">10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
+            </table><div style="margin-left:55%;">{get_ttd_statis(pjb, gol_pjb, nip_ttd, 65)}</div></div>'''
 
-    # 3. SPD BELAKANG (POIN II KIRI BERSIH)
+    # 3. SPD BELAKANG (HANYA 1 LEMBAR - POIN II KIRI BERSIH)
     if "SPD Belakang" in opsi_cetak:
         ttd_asal = get_ttd_statis(pjb, gol_pjb, nip_ttd, 65)
         ttd_tujuan = f'''<div style="text-align:center; line-height:1.2; font-size:10pt;"><br><b>Mengesahkan</b><br>{instansi_tujuan}<div style="height:65px;"></div><b><u>{pjb_tujuan}</u></b><br>{gol_tujuan}<br>NIP. {nip_tujuan}</div>''' if jenis_perjalanan == "Luar Daerah" else ""
@@ -185,10 +179,10 @@ if tab_menu == "Input & Cetak":
 
         html_out += f'''<div class="kertas"><table class="tabel-border" style="height:88%;">
             <tr style="height: 220px;"><td width="50%"></td><td style="padding:10px;">{rv("I.", "Berangkat dari", "Bajawa", tgl_bkt)}<table class="visum-table"><tr><td width="10%"></td><td width="35%">Ke</td><td width="5%">:</td><td>{tujuan}</td></tr></table>{ttd_asal}</td></tr>
-            <tr style="height: 190px;"><td>{rv("II.", "Tiba di", tujuan, tgl_bkt)}<br></td><td style="padding:10px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="5%">:</td><td>Bajawa</td></tr></table>{ttd_tujuan}</td></tr>
+            <tr style="height: 190px;"><td>{rv("II.", "Tiba di", tujuan, tgl_bkt)}</td><td style="padding:10px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="5%">:</td><td>Bajawa</td></tr></table>{ttd_tujuan}</td></tr>
             <tr style="height: 190px;"><td>{rv("III.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
             <tr style="height: 190px;"><td>{rv("IV.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
-            <tr style="height: 220px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9.2pt; line-height:1.2;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya...</p>{ttd_asal}</td></tr>
+            <tr style="height: 220px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9.2pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_asal}</td></tr>
         </table>
         <div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div>
         <div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.6pt; text-align:justify; color:black; line-height:1.2;">
