@@ -54,7 +54,7 @@ st.markdown("""
     .judul-rapat { text-align: center; line-height: 1.0 !important; margin-top: 5px; }
     .judul-rapat h3, .judul-rapat p { margin: 0; line-height: 1.0 !important; }
 
-    /* PERBAIKAN: ISI NARASI SPT (Line Spacing 1.0 sesuai instruksi) */
+    /* ISI NARASI SPT */
     .isi-surat-spt { line-height: 1.0 !important; margin-top: 10px; }
     .isi-surat-spt table { line-height: 1.0 !important; }
 
@@ -129,7 +129,7 @@ with st.sidebar:
             for p in daftar:
                 st.session_state.arsip_register.append({
                     "Nama": p['nama'], "No SPT": no_spt, "No SPD": p['spd'],
-                    "Berangkat": tgl_bkt, "Pulang": tgl_kbl, "Lama": lama, "Ket": ket_reg
+                    "Berangkat": tgl_bkt, "Pulang": tgl_kbl, "Lamanya": lama, "Ket": ket_reg
                 })
             st.components.v1.html("<script>setTimeout(function(){ window.parent.print(); }, 1200);</script>", height=0)
 
@@ -159,7 +159,24 @@ html_out = '<div class="main-container">'
 if tab_menu == "Input & Cetak":
     if "SPT" in opsi_cetak:
         p_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='5%'>:</td><td width='5%'>{i+1}.</td><td width='20%'>Nama</td><td width='5%'>:</td><td><b>{p['nama']}</b></td></tr><tr><td></td><td></td><td></td><td>Pangkat/Gol</td><td>:</td><td>{p['gol']}</td></tr><tr><td></td><td></td><td></td><td>NIP</td><td>:</td><td>{p['nip']}</td></tr><tr><td></td><td></td><td></td><td>Jabatan</td><td>:</td><td>{p['jab']}</td></tr>" for i, p in enumerate(daftar)])
-        html_out += f'<div class="kertas">{kop_pemda}<div class="judul-rapat"><h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3><p>NOMOR : {no_spt}</p></div><div class="isi-surat-spt"><table class="visum-table"><tr><td width="12%">Dasar</td><td width="5%">:</td><td>{anggaran}</td></tr></table><p class="text-center text-bold" style="margin:10px 0;">M E M E R I N T A H K A N</p><table class="visum-table">{p_rows}</table><table class="visum-table" style="margin-top:10px;"><tr><td width="12%">Untuk</td><td width="5%">:</td><td>{maksud} ke {tujuan}</td></tr></table></div>{get_ttd(90)}</div>'
+        
+        # PENYESUAIAN: Jarak margin-top pada tabel 'Untuk' ditambah agar tidak terlalu mepet dengan 'Kepada'
+        html_out += f'''
+        <div class="kertas">
+            {kop_pemda}
+            <div class="judul-rapat">
+                <h3 class="text-bold underline">SURAT PERINTAH TUGAS</h3>
+                <p>NOMOR : {no_spt}</p>
+            </div>
+            <div class="isi-surat-spt">
+                <table class="visum-table"><tr><td width="12%">Dasar</td><td width="5%">:</td><td>{anggaran}</td></tr></table>
+                <p class="text-center text-bold" style="margin:10px 0;">M E M E R I N T A H K A N</p>
+                <table class="visum-table">{p_rows}</table>
+                <table class="visum-table" style="margin-top:25px;"> <tr><td width="12%">Untuk</td><td width="5%">:</td><td>{maksud} ke {tujuan}</td></tr>
+                </table>
+            </div>
+            {get_ttd(90)}
+        </div>'''
 
     for p in daftar:
         if "SPD Depan" in opsi_cetak:
