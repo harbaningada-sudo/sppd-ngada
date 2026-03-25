@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import logo  # Memanggil file logo.py di repository kamu
+import logo 
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
@@ -113,15 +113,6 @@ with st.sidebar:
 
         with st.expander("📄 DATA UTAMA"):
             no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
-            
-            # --- LOGIKA DASAR SPT ---
-            if wilayah == "Dalam Daerah":
-                dasar_default = "DPA Bagian Perekonomian dan SDA Setda Ngada Tahun Anggaran 2026"
-            else:
-                dasar_default = "" # Luar Daerah kosong untuk input manual
-            
-            anggaran = st.text_area("Dasar", dasar_default)
-            
             kode_spd = st.text_input("Kode No SPD", "094/Prokopim")
             maksud = st.text_area("Maksud Perjalanan", "Dalam rangka mendampingi...")
             tujuan = st.text_input("Tujuan", "Kecamatan Riung")
@@ -130,8 +121,10 @@ with st.sidebar:
             tgl_bkt = st.text_input("Tanggal Berangkat", "17 Maret 2026")
             tgl_kbl = st.text_input("Tanggal Pulang", "17 Maret 2026")
             ket_reg = st.text_input("Keterangan Register", "-")
+            anggaran = st.text_input("Dasar Anggaran", "DPA Bagian Perekonomian dan SDA Setda Ngada 2026")
 
         st.subheader("🖋️ TANDA TANGAN")
+        # Label TTD Fleksibel
         ttd_label = st.selectbox("Penandatangan", ["An. BUPATI NGADA", "WAKIL BUPATI NGADA", "BUPATI NGADA"])
         pjb = st.text_input("Nama Pejabat", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
         gol_pjb = st.text_input("Pangkat/Gol", "Pembina Utama Muda - IV/c")
@@ -160,16 +153,18 @@ with st.sidebar:
 kop_pemda = f'''<table class="kop-table"><tr><td width="15%"><img src="data:image/png;base64,{logo.PEMDA}" width="75"></td><td class="kop-teks"><h3>PEMERINTAH KABUPATEN NGADA</h3><h2>SEKRETARIAT DAERAH</h2><p>Jln. Soekarno - Hatta No. 1 Telp (0384) 2225834</p><p class="text-bold">BAJAWA</p></td><td width="15%"></td></tr></table>'''
 
 def get_ttd(space): 
+    # Logika Label TTD
     label_final = f"<b>{ttd_label}</b>"
     jab_final = f"{jab_ttd}," if ttd_label == "An. BUPATI NGADA" else ""
     ub_final = f"Ub. {ub}," if (ub and ttd_label == "An. BUPATI NGADA") else ""
-    return f'''<div style="margin-left:55%; margin-top:10px; line-height:1.2; text-align:center;">{label_final}<br>{jab_final}<br>{ub_final}<div style="height:{space}px;"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'''
+    
+    return f'''<div style="margin-left:55%; margin-top:10px; line-height:1.2;">{label_final}<br>{jab_final}<br>{ub_final}<div style="height:{space}px;"></div><b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'''
 
 html_out = '<div class="main-container">'
 
 if tab_menu == "Input & Cetak":
     if "SPT" in opsi_cetak:
-        # --- LOGIKA KOP SPT ---
+        # --- LOGIKA PEMISAH KOP SPT ---
         if wilayah == "Luar Daerah":
             kop_final = f'<div class="kop-garuda"><img src="data:image/png;base64,{logo.GARUDA}"><h2>BUPATI NGADA</h2></div>'
         else:
@@ -193,23 +188,41 @@ if tab_menu == "Input & Cetak":
                 <tr><td class="col-no" rowspan="3">7.</td><td>Lamanya Perjalanan Dinas</td><td colspan="3">{lama}</td></tr>
                 <tr><td>a. Tanggal Berangkat</td><td colspan="3">{tgl_bkt}</td></tr>
                 <tr><td>b. Tanggal Harus Kembali</td><td colspan="3">{tgl_kbl}</td></tr>
+                <tr><td class="col-no">8.</td><td>Pengikut</td><td class="text-center" width="20%">Tgl Lahir</td><td colspan="2" class="text-center">Keterangan</td></tr>
+                <tr style="height:22px;"><td></td><td>1.</td><td></td><td colspan="2"></td></tr>
+                <tr><td class="col-no" rowspan="3">9.</td><td>Pembebanan Anggaran</td><td colspan="3"></td></tr>
+                <tr><td>a. Instansi</td><td colspan="3">a. Bagian Perekonomian dan SDA</td></tr>
+                <tr><td>b. Mata Anggaran</td><td colspan="3"></td></tr>
                 <tr><td class="col-no">10.</td><td>Keterangan lain-lain</td><td colspan="3"></td></tr>
             </table>{get_ttd(75)}</div>'''
 
     if "SPD Belakang" in opsi_cetak:
+        ttd_bk_html = f'''<div style="text-align:center; line-height:1.2; font-size:10pt; margin-top:5px;">
+            <b>An. BUPATI NGADA</b><br>{jab_ttd},<br>{f"Ub. {ub}," if ub else ""}<div style="height:65px;"></div>
+            <b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}</div>'''
+        
         def rv(num, label, val, d_v, is_n=True):
             n_c = f'<td width="10%">{num}</td>' if is_n else ""
             return f'''<table class="visum-table"><tr>{n_c}<td width="35%">{label}</td><td width="5%">:</td><td>{val}</td></tr><tr>{"<td></td>" if is_n else ""}<td>Pada Tanggal</td><td>:</td><td>{d_v}</td></tr></table>'''
 
+        # --- LOGIKA POIN II KIRI BERSIH UNTUK LUAR DAERAH ---
         kolom_kiri_ii = rv("II.", "Tiba di", tujuan, tgl_bkt) if wilayah == "Dalam Daerah" else f'<table class="visum-table"><tr><td width="10%">II.</td><td width="35%">Tiba di</td><td width="5%">:</td><td>{tujuan}</td></tr></table>'
-        ttd_bk = get_ttd(65)
 
         html_out += f'''<div class="kertas"><table class="tabel-border" style="height:88%;">
-            <tr style="height: 220px;"><td width="50%"></td><td style="padding:10px;">{rv("I.", "Berangkat dari", "Bajawa", tgl_bkt)}<table class="visum-table"><tr><td width="10%"></td><td width="35%">Ke</td><td width="5%">:</td><td>{tujuan}</td></tr></table>{ttd_bk}</td></tr>
+            <tr style="height: 220px;"><td width="50%"></td><td style="padding:10px;">{rv("I.", "Berangkat dari", "Bajawa", tgl_bkt)}<table class="visum-table"><tr><td width="10%"></td><td width="35%">Ke</td><td width="5%">:</td><td>{tujuan}</td></tr></table>{ttd_bk_html}</td></tr>
             <tr style="height: 190px;"><td>{kolom_kiri_ii}</td><td style="padding:10px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="5%">:</td><td>Bajawa</td></tr></table></td></tr>
-            <tr style="height: 220px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9.2pt; line-height:1.2; margin-top:5px;">Telah diperiksa...</p>{ttd_bk}</td></tr>
+            <tr style="height: 190px;"><td>{rv("III.", "Tiba di", "", "")}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
+            <tr style="height: 220px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9.2pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_bk_html}</td></tr>
         </table>
-        <div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.6pt; text-align:justify; color:black; line-height:1.2;"><b>VII. Perhatian :</b><br>Pejabat yang menerbitkan SPD... bertanggung jawab...</div></div>'''
+        <div style="border:1pt solid black; border-top:none; padding:8px; font-size:10.5pt;"><b>VI. Catatan Lain-lain</b></div>
+        <div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.6pt; text-align:justify; color:black; line-height:1.2;">
+            <b>VII. Perhatian :</b><br>
+            Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.
+        </div></div>'''
+
+    if "Register" in opsi_cetak:
+        r_rows = "".join([f"<tr><td class='text-center'>{i+1}</td><td>{r['Nama']}</td><td>{r['No SPT']}</td><td>{r['No SPD']}</td><td>{r['Berangkat']}</td><td>{r['Pulang']}</td><td>{r['Lama']}</td><td>-</td></tr>" for i, r in enumerate(st.session_state.arsip_register)])
+        html_out += f'''<div class="kertas kertas-landscape register-page"><h3 class="text-center text-bold">REGISTER SURAT PERJALANAN DINAS</h3><br><table class="tabel-border" style="font-size:9pt; width:100%;"><thead><tr style="background:#eee;"><th>No</th><th>Nama Pegawai</th><th>Nomor SPT</th><th>Nomor SPD</th><th>Tgl Bkt</th><th>Tgl Kbl</th><th>Lamanya</th><th>Ket</th></tr></thead><tbody>{r_rows}</tbody></table></div>'''
 
 html_out += '</div>'
 st.markdown(html_out, unsafe_allow_html=True)
