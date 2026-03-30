@@ -19,6 +19,7 @@ st.markdown("""
     .stApp { background-color: #525659 !important; }
     .main-container { display: flex; flex-direction: column; align-items: center; width: 100%; padding: 10px 0; }
 
+    /* KERTAS UMUM (PORTRAIT LEGAL) */
     .kertas { 
         background-color: white !important; 
         width: 215.9mm; height: 330mm; 
@@ -28,14 +29,20 @@ st.markdown("""
         font-size: 10.5pt; page-break-after: always; overflow: hidden; position: relative;
     }
 
+    /* KOP SURAT LINE SPACING 1.0 */
+    .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 5px; }
+    .kop-table td { border: none !important; padding: 0 !important; vertical-align: middle; }
+    .kop-teks { text-align: center; line-height: 1.0 !important; } 
+    .kop-teks h3, .kop-teks h2, .kop-teks p { margin: 0; line-height: 1.0 !important; padding: 1px 0; }
+
+    /* KHUSUS KOP GARUDA (LUAR DAERAH) */
     .kop-garuda { text-align: center; margin-bottom: 10px; line-height: 1.0; width: 100%; }
     .kop-garuda img { width: 70px; margin-bottom: 5px; }
     .kop-garuda h2 { margin: 0; font-size: 16pt; font-weight: bold; letter-spacing: 2px; }
 
-    .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 5px; }
-    .kop-teks { text-align: center; line-height: 1.0 !important; } 
     .judul-rapat { text-align: center; line-height: 1.0 !important; margin-top: 5px; }
-    
+    .judul-rapat h3, .judul-rapat p { margin: 0; line-height: 1.0 !important; }
+
     .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; table-layout: fixed; }
     .tabel-border td { border: 1pt solid black !important; padding: 4px 8px !important; vertical-align: top; color: black !important; font-size: 9.5pt; line-height: 1.1 !important; }
     
@@ -119,7 +126,7 @@ with st.sidebar:
                 st.session_state.arsip_register = []
                 st.rerun()
 
-# --- TOMBOL EXCEL OTOMATIS ---
+# --- TOMBOL DOWNLOAD EXCEL OTOMATIS ---
 if st.session_state.arsip_register:
     df_reg_xl = pd.DataFrame(st.session_state.arsip_register)
     output = BytesIO()
