@@ -10,7 +10,7 @@ st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
 if 'arsip_register' not in st.session_state:
     st.session_state.arsip_register = []
 
-# CSS UNTUK PRESISI CETAK FULL LEGAL & LANDSCAPE REGISTER
+# CSS UNTUK PRESISI CETAK (FIX TERPOTONG)
 st.markdown("""
 <style>
     header, footer, #MainMenu { visibility: hidden; }
@@ -31,13 +31,12 @@ st.markdown("""
         font-size: 10.5pt; page-break-after: always; overflow: hidden; position: relative;
     }
 
-    /* KHUSUS KOP GARUDA (LUAR DAERAH) */
-    .kop-garuda { text-align: center; margin-bottom: 10px; line-height: 1.0; width: 100%; }
-    .kop-garuda img { width: 70px; margin-bottom: 5px; }
-    .kop-garuda h2 { margin: 0; font-size: 16pt; font-weight: bold; letter-spacing: 2px; }
-
-    /* KHUSUS REGISTER (LANDSCAPE) */
-    .kertas-landscape { width: 355.6mm !important; height: 215.9mm !important; padding: 10mm !important; }
+    /* KHUSUS REGISTER LANDSCAPE (FIX TERPOTONG) */
+    .kertas-landscape {
+        width: 330mm !important; /* Standar Legal Landscape */
+        height: 215.9mm !important;
+        padding: 10mm !important;
+    }
 
     .kop-table { width: 100%; border: none !important; border-bottom: 3.5pt solid black !important; margin-bottom: 5px; }
     .kop-table td { border: none !important; padding: 0 !important; vertical-align: middle; }
@@ -50,8 +49,13 @@ st.markdown("""
     .isi-surat-spt { line-height: 1.5 !important; margin-top: 10px; }
 
     .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; table-layout: fixed; }
-    .tabel-border td { border: 1pt solid black !important; padding: 4px 8px !important; vertical-align: top; color: black !important; font-size: 9.5pt; line-height: 1.1 !important; }
-    .col-no { width: 30px !important; text-align: center !important; }
+    .tabel-border td, .tabel-border th { border: 1pt solid black !important; padding: 4px 6px !important; vertical-align: top; color: black !important; font-size: 9.5pt; line-height: 1.1 !important; word-wrap: break-word; }
+    
+    /* KHUSUS TABEL REGISTER AGAR TIDAK TERPOTONG */
+    .table-reg { font-size: 8pt !important; width: 100% !important; border-collapse: collapse; table-layout: fixed; }
+    .table-reg th { background-color: #eeeeee !important; text-align: center; font-weight: bold; }
+
+    .col-no { width: 35px !important; text-align: center !important; }
 
     .visum-table { width: 100%; border: none !important; border-collapse: collapse; margin: 0 !important; }
     .visum-table td { border: none !important; padding: 0 !important; font-size: 10pt; line-height: 1.2; color: black !important; vertical-align: top; }
@@ -62,9 +66,9 @@ st.markdown("""
         [data-testid="stSidebar"], .stButton, .no-print { display: none !important; }
         .stApp, .main-container { background-color: white !important; padding: 0 !important; margin: 0 !important; }
         .kertas { box-shadow: none !important; margin: 0 !important; width: 215.9mm !important; height: 330mm !important; }
-        .kertas-landscape { width: 355.6mm !important; height: 215.9mm !important; }
+        .kertas-landscape { width: 330mm !important; height: 215.9mm !important; }
         @page { size: legal portrait; margin: 0; }
-        .register-page { @page { size: legal landscape; } }
+        .register-page { @page { size: legal landscape; margin: 5mm; } }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -86,14 +90,13 @@ with st.sidebar:
             daftar = []
             for i in range(st.session_state.jml):
                 st.markdown(f"**Pegawai {i+1}**")
-                daftar.append({
-                    "nama": st.text_input(f"Nama", f"Nama {i+1}", key=f"n{i}"),
-                    "nip": st.text_input(f"NIP", "19XXXXXXXXXXXXXX", key=f"nip{i}"),
-                    "gol": st.text_input(f"Gol", "III/a", key=f"g{i}"),
-                    "jab": st.text_input(f"Jabatan", "Pelaksana", key=f"j{i}"),
-                    "spd": st.text_input(f"No SPD", f"530 /02/2026", key=f"spd{i}"),
-                    "lembar": st.text_input(f"Lembar ke", "I", key=f"lbr{i}")
-                })
+                n = st.text_input(f"Nama", f"Nama {i+1}", key=f"n{i}")
+                ni = st.text_input(f"NIP", "19XXXXXXXXXXXXXX", key=f"nip{i}")
+                g = st.text_input(f"Gol", "III/a", key=f"g{i}")
+                j = st.text_input(f"Jabatan", "Pelaksana", key=f"j{i}")
+                s = st.text_input(f"No SPD", f"530 /02/2026", key=f"spd{i}")
+                l = st.text_input(f"Lembar ke", "I", key=f"lbr{i}")
+                daftar.append({"nama": n, "nip": ni, "gol": g, "jab": j, "spd": s, "lembar": l})
 
         with st.expander("📄 DATA UTAMA"):
             no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
@@ -104,9 +107,7 @@ with st.sidebar:
             lama = st.text_input("Lama Hari", "1 (Satu) hari")
             tgl_bkt = st.text_input("Tanggal Berangkat", "17 Maret 2026")
             tgl_kbl = st.text_input("Tanggal Pulang", "17 Maret 2026")
-            
-            default_dasar = "DPA Bagian Perekonomian dan SDA Setda Ngada Tahun Anggaran 2026" if wilayah == "Dalam Daerah" else ""
-            anggaran = st.text_area("Dasar Anggaran", value=default_dasar)
+            anggaran = st.text_input("Dasar Anggaran", "DPA Bagian Perekonomian dan SDA Setda Ngada 2026")
 
         st.subheader("🖋️ TANDA TANGAN")
         ttd_label = st.selectbox("Penandatangan", ["An. BUPATI NGADA", "WAKIL BUPATI NGADA", "BUPATI NGADA"])
@@ -192,7 +193,7 @@ if tab_menu == "Input & Cetak":
             <tr style="height: 160px;"><td>{kolom_kiri_ii}</td><td style="padding:10px;">{rv("", "Berangkat dari", tujuan, tgl_kbl, False)}<table class="visum-table"><tr><td width="35%">Ke</td><td width="5%">:</td><td>Bajawa</td></tr></table></td></tr>
             <tr style="height: 160px;"><td>{rv("III.", "Tiba di", "", "", True)}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
             <tr style="height: 160px;"><td>{rv("IV.", "Tiba di", "", "", True)}</td><td style="padding:10px;">{rv("", "Berangkat dari", "", "", False)}</td></tr>
-            <tr style="height: 180px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9.2pt; line-height:1.2; margin-top:5px;">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan</p>{ttd_bk_html}</td></tr>
+            <tr style="height: 180px;"><td>{rv("V.", "Tiba Kembali", "Bajawa", tgl_kbl)}</td><td style="padding:10px;"><p style="font-style:italic; font-size:9.2pt; line-height:1.2; margin-top:5px;">Telah diperiksa...</p>{ttd_bk_html}</td></tr>
         </table>
         <div style="border:1pt solid black; border-top:none; padding:8px; font-size:10pt;"><b>VI. Catatan Lain-lain</b></div>
         <div style="border:1pt solid black; border-top:none; padding:8px; font-size:8.3pt; text-align:justify; color:black; line-height:1.2;">
@@ -200,10 +201,28 @@ if tab_menu == "Input & Cetak":
             Pejabat yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta Bendahara Pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian dan kealpaannya.
         </div></div>'''
 
-    # 4. REGISTER (TERPISAH)
+    # 4. REGISTER (FIX AGAR TIDAK TERPOTONG)
     if "Register" in opsi_cetak:
         r_rows = "".join([f"<tr><td class='text-center'>{i+1}</td><td>{r['Nama']}</td><td>{r['No SPT']}</td><td>{r['No SPD']}</td><td>{r['Tujuan']}</td><td class='text-center'>{r['Berangkat']}</td><td class='text-center'>{r['Pulang']}</td><td class='text-center'>{r['Lama']}</td><td>{r['Ket']}</td></tr>" for i, r in enumerate(st.session_state.arsip_register)])
-        html_out += f'''<div class="kertas kertas-landscape register-page"><h3 class="text-center text-bold">REGISTER SURAT PERJALANAN DINAS</h3><br><table class="tabel-border" style="font-size:8.5pt; width:100%;"><thead><tr style="background:#eee;"><th>No</th><th>Nama Pegawai</th><th>Nomor SPT</th><th>Nomor SPD</th><th>Tempat Tujuan</th><th>Tgl Bkt</th><th>Tgl Kbl</th><th>Lamanya</th><th>Wilayah</th></tr></thead><tbody>{r_rows}</tbody></table></div>'''
+        html_out += f'''<div class="kertas kertas-landscape register-page">
+            <h3 class="text-center text-bold">REGISTER SURAT PERJALANAN DINAS</h3><br>
+            <table class="table-reg tabel-border">
+                <thead>
+                    <tr>
+                        <th width="30">No</th>
+                        <th width="140">Nama Pegawai</th>
+                        <th width="140">Nomor SPT</th>
+                        <th width="140">Nomor SPD</th>
+                        <th>Tempat Tujuan</th>
+                        <th width="80">Tgl Bkt</th>
+                        <th width="80">Tgl Kbl</th>
+                        <th width="60">Lama</th>
+                        <th width="70">Wilayah</th>
+                    </tr>
+                </thead>
+                <tbody>{r_rows}</tbody>
+            </table>
+        </div>'''
 
 html_out += '</div>'
 st.markdown(html_out, unsafe_allow_html=True)
