@@ -7,7 +7,11 @@ from io import BytesIO
 # ─────────────────────────────────────────────
 # 1. KONFIGURASI HALAMAN
 # ─────────────────────────────────────────────
-st.set_page_config(page_title="Sistem SPD Ngada Pro", layout="wide")
+st.set_page_config(
+    page_title="Sistem SPD Ngada Pro",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 if "arsip_register" not in st.session_state:
     st.session_state.arsip_register = []
@@ -22,6 +26,16 @@ st.markdown("""
     header, footer, #MainMenu { visibility: hidden; }
     .stDeployButton { display: none; }
     .stApp { background-color: #525659 !important; }
+
+    /* PAKSA SIDEBAR SELALU TAMPIL - tidak bisa di-collapse */
+    [data-testid="collapsedControl"] { display: none !important; }
+    [data-testid="stSidebar"] {
+        min-width: 340px !important;
+        max-width: 340px !important;
+        transform: translateX(0) !important;
+        visibility: visible !important;
+    }
+
     .main-container {
         display: flex; flex-direction: column;
         align-items: center; width: 100%; padding: 10px 0;
