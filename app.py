@@ -1,34 +1,34 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import logo  # Memanggil file logo.py di repository kamu
+import logo  # Pastikan file logo.py ada di folder yang sama
 from io import BytesIO
 
-# 1. KONFIGURASI HALAMAN (Wajib Paling Atas)
+# 1. KONFIGURASI HALAMAN (Wajib di baris paling atas)
 st.set_page_config(
     page_title="Sistem SPD Ngada Pro", 
     layout="wide", 
     initial_sidebar_state="expanded"
 )
 
-# --- INISIALISASI DATABASE REGISTER ---
+# --- INISIALISASI DATA ---
 if 'arsip_register' not in st.session_state:
     st.session_state.arsip_register = []
 if 'jml' not in st.session_state:
     st.session_state.jml = 1
 
-# 2. CSS UNTUK PRESISI CETAK & FIX SIDEBAR
+# 2. CSS UNTUK TAMPILAN KERTAS & SIDEBAR
 st.markdown("""
 <style>
-    /* Sembunyikan elemen dekoratif Streamlit */
+    /* Menghilangkan header default agar bersih */
     header, footer, .stDeployButton { visibility: hidden; display: none !important; }
     
-    /* Area Utama (Background Abu-abu seperti PDF Viewer) */
+    /* Warna area kerja (Abu-abu seperti viewer PDF) */
     [data-testid="stMainViewContainer"] {
         background-color: #525659 !important;
     }
 
-    /* Container Kertas */
+    /* Wadah Kertas di Tengah */
     .main-container { 
         display: flex; 
         flex-direction: column; 
@@ -37,7 +37,7 @@ st.markdown("""
         padding: 20px 0; 
     }
 
-    /* KERTAS LEGAL (215.9mm x 330mm) */
+    /* KERTAS UKURAN LEGAL */
     .kertas { 
         background-color: white !important; 
         width: 215.9mm; 
@@ -53,23 +53,22 @@ st.markdown("""
         overflow: hidden;
     }
 
-    /* KOP SURAT */
-    .kop-table { width: 100%; border-bottom: 3.5pt solid black !important; margin-bottom: 5px; border-collapse: collapse; }
-    .kop-teks { text-align: center; line-height: 1.0 !important; }
-    .kop-teks h3, .kop-teks h2, .kop-teks p { margin: 2px 0; }
-
-    /* TABEL SPD */
-    .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; }
-    .tabel-border td { border: 1pt solid black !important; padding: 4px 8px !important; vertical-align: top; color: black !important; font-size: 9.5pt; }
+    /* STYLE KOP & TABEL */
+    .kop-table { width: 100%; border-bottom: 3.5pt solid black !important; margin-bottom: 10px; border-collapse: collapse; }
+    .kop-teks { text-align: center; line-height: 1.1 !important; }
+    .kop-teks h3, .kop-teks h2 { margin: 2px 0; }
     
-    .visum-table { width: 100%; border-collapse: collapse; margin: 0 !important; }
-    .visum-table td { border: none !important; padding: 1px 0; font-size: 10pt; line-height: 1.2; color: black !important; }
+    .tabel-border { width: 100%; border-collapse: collapse !important; border: 1pt solid black !important; }
+    .tabel-border td { border: 1pt solid black !important; padding: 4px 8px !important; color: black !important; font-size: 9.5pt; }
+    
+    .visum-table { width: 100%; border-collapse: collapse; }
+    .visum-table td { border: none !important; padding: 2px 0; font-size: 10pt; color: black !important; vertical-align: top; }
 
     .text-center { text-align: center; } 
     .text-bold { font-weight: bold; } 
     .underline { text-decoration: underline; }
 
-    /* ATURAN CETAK */
+    /* PENGATURAN SAAT PRINT */
     @media print {
         [data-testid="stSidebar"], .stButton, .no-print { display: none !important; }
         [data-testid="stMainViewContainer"] { background-color: white !important; }
@@ -80,80 +79,69 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. NAVIGASI INPUT (SIDEBAR)
+# 3. PANEL NAVIGASI (SIDEBAR KIRI)
 with st.sidebar:
-    st.header("📋 PANEL KONTROL")
-    wilayah = st.selectbox("Jenis Wilayah", ["Dalam Daerah", "Luar Daerah"])
-    tab_menu = st.radio("Menu", ["Input & Cetak", "Kelola Register"])
+    st.header("📋 NAVIGASI INPUT")
+    wilayah = st.selectbox("Pilih Wilayah", ["Dalam Daerah", "Luar Daerah"])
+    menu = st.radio("Pindah Menu", ["Input & Cetak", "Kelola Register"])
     
-    if tab_menu == "Input & Cetak":
-        opsi_cetak = st.multiselect("Pilih Dokumen", ["SPT", "SPD Depan", "SPD Belakang"], default=["SPT", "SPD Depan"])
+    if menu == "Input & Cetak":
+        opsi_cetak = st.multiselect("Dokumen yang Dicetak", ["SPT", "SPD Depan"], default=["SPT", "SPD Depan"])
         
-        # --- DATA PEGAWAI ---
+        # INPUT DATA PEGAWAI
         with st.expander("👤 DATA PEGAWAI", expanded=True):
-            c1, c2 = st.columns(2)
-            if c1.button("➕ Tambah"): st.session_state.jml += 1
-            if c2.button("➖ Hapus") and st.session_state.jml > 1: st.session_state.jml -= 1
+            col1, col2 = st.columns(2)
+            if col1.button("➕ Tambah"): st.session_state.jml += 1
+            if col2.button("➖ Hapus") and st.session_state.jml > 1: st.session_state.jml -= 1
             
-            daftar = []
+            list_pegawai = []
             for i in range(st.session_state.jml):
                 st.markdown(f"**Pegawai {i+1}**")
-                daftar.append({
-                    "nama": st.text_input("Nama", f"Nama {i+1}", key=f"n{i}"),
-                    "nip": st.text_input("NIP", "19XXXXXXXXXXXXXX", key=f"nip{i}"),
-                    "gol": st.text_input("Gol", "III/a", key=f"g{i}"),
-                    "jab": st.text_input("Jabatan", "Pelaksana", key=f"j{i}"),
-                    "spd": st.text_input("No SPD", f"530 /02/2026", key=f"spd{i}"),
-                    "lembar": st.text_input("Lembar ke", "I", key=f"lbr{i}")
+                list_pegawai.append({
+                    "nama": st.text_input("Nama Lengkap", f"Nama {i+1}", key=f"n_{i}"),
+                    "nip": st.text_input("NIP", "19XXXXXXXXXXXXXX", key=f"nip_{i}"),
+                    "gol": st.text_input("Golongan", "III/a", key=f"g_{i}"),
+                    "jab": st.text_input("Jabatan", "Pelaksana", key=f"j_{i}"),
+                    "spd": st.text_input("Nomor SPD", f"530/02/2026", key=f"s_{i}"),
+                    "lbr": st.text_input("Lembar Ke", "I", key=f"l_{i}")
                 })
 
-        # --- DATA UTAMA ---
-        with st.expander("📄 DATA SURAT"):
+        # DATA PERJALANAN
+        with st.expander("📄 DATA PERJALANAN"):
             no_spt = st.text_input("Nomor SPT", "094/Prokopim/557/02/2026")
-            kode_spd = st.text_input("Kode No SPD", "094/Prokopim")
-            maksud = st.text_area("Maksud Perjalanan", "Mendampingi Bupati...")
+            maksud = st.text_area("Maksud Tugas", "Melakukan koordinasi...")
             tujuan = st.text_input("Tujuan", "Kecamatan Riung")
-            alat = st.text_input("Alat Angkut", "Mobil Dinas")
             lama = st.text_input("Lama Hari", "1 (Satu) hari")
-            tgl_bkt = st.text_input("Tgl Berangkat", "17 Maret 2026")
-            tgl_kbl = st.text_input("Tgl Kembali", "17 Maret 2026")
+            tgl_bkt = st.text_input("Tanggal Berangkat", "17 Maret 2026")
             anggaran = st.text_area("Dasar Anggaran", "DPA Bagian Perekonomian 2026")
 
-        # --- TANDA TANGAN ---
-        with st.expander("🖋️ PENANDA TANGAN"):
-            ttd_label = st.selectbox("Status", ["An. BUPATI NGADA", "WAKIL BUPATI NGADA", "BUPATI NGADA"])
-            pjb = st.text_input("Nama Pejabat", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
-            gol_pjb = st.text_input("Pangkat/Gol Pejabat", "Pembina Utama Muda - IV/c")
-            jab_ttd = st.text_input("Jabatan Utama", "Pj. Sekretaris Daerah")
-            ub = st.text_input("Ub. (Opsional)", "Asisten Perekonomian")
-            nip_ttd = st.text_input("NIP Pejabat", "19710328 199203 1 011")
+        # PENANDA TANGAN
+        with st.expander("🖋️ PEJABAT TTD"):
+            ttd_status = st.selectbox("Status", ["An. BUPATI NGADA", "BUPATI NGADA"])
+            pjb_nama = st.text_input("Nama Pejabat TTD", "Yohanes C. Watu Ngebu, S.Sos., M.Si")
+            pjb_jab = st.text_input("Jabatan Utama", "Pj. Sekretaris Daerah")
+            pjb_ub = st.text_input("Ub. (Jika Ada)", "Asisten Perekonomian")
+            pjb_nip = st.text_input("NIP Pejabat TTD", "19710328 199203 1 011")
 
-        if st.button("🖨️ PROSES CETAK & SIMPAN"):
-            for p in daftar:
-                st.session_state.arsip_register.append({
-                    "Nama": p['nama'], "No SPT": no_spt, "No SPD": p['spd'],
-                    "Tujuan": tujuan, "Berangkat": tgl_bkt, "Ket": wilayah
-                })
-            st.components.v1.html("<script>setTimeout(function(){ window.parent.print(); }, 1000);</script>", height=0)
+        if st.button("🖨️ CETAK SEKARANG"):
+            st.components.v1.html("<script>window.parent.print();</script>", height=0)
 
-# --- LOGIC RENDER TANDA TANGAN ---
-def get_ttd_html(space):
-    label_f = f"<b>{ttd_label}</b>"
-    jab_f = f"{jab_ttd},<br>" if ttd_label == "An. BUPATI NGADA" else ""
-    ub_f = f"Ub. {ub},<br>" if (ub and ttd_label == "An. BUPATI NGADA") else ""
+# --- FUNGSI TANDA TANGAN ---
+def render_ttd(gap):
+    status_h = f"<b>{ttd_status}</b><br>"
+    jab_h = f"{pjb_jab},<br>" if ttd_status == "An. BUPATI NGADA" else ""
+    ub_h = f"Ub. {pjb_ub},<br>" if (pjb_ub and ttd_status == "An. BUPATI NGADA") else ""
     return f'''
-    <div style="margin-left:55%; margin-top:15px; text-align:center; line-height:1.2;">
-        {label_f}<br>{jab_f}{ub_f}
-        <div style="height:{space}px;"></div>
-        <b><u>{pjb}</u></b><br>{gol_pjb}<br>NIP. {nip_ttd}
+    <div style="margin-left:55%; margin-top:20px; text-align:center; line-height:1.2;">
+        {status_h}{jab_h}{ub_h}
+        <div style="height:{gap}px;"></div>
+        <b><u>{pjb_nama}</u></b><br>NIP. {pjb_nip}
     </div>'''
 
-# 4. TAMPILAN UTAMA (PREVIEW KERTAS)
-if tab_menu == "Input & Cetak":
-    html_final = '<div class="main-container">'
-    
-    # Kop Pemda
-    kop_pemda = f'''
+# 4. TAMPILAN HALAMAN UTAMA (PREVIEW)
+if menu == "Input & Cetak":
+    # Persiapan Kop
+    kop_surat = f'''
     <table class="kop-table">
         <tr>
             <td width="15%"><img src="data:image/png;base64,{logo.PEMDA}" width="75"></td>
@@ -167,59 +155,52 @@ if tab_menu == "Input & Cetak":
         </tr>
     </table>'''
 
-    # --- RENDER SPT ---
+    container_html = '<div class="main-container">'
+
+    # BAGIAN SPT
     if "SPT" in opsi_cetak:
-        kop_spt = f'<div class="text-center"><img src="data:image/png;base64,{logo.GARUDA}" width="75"><br><h2>BUPATI NGADA</h2></div>' if wilayah == "Luar Daerah" else kop_pemda
-        p_rows = "".join([f"<tr><td width='12%'>Kepada</td><td width='5%'>:</td><td width='5%'>{i+1}.</td><td width='20%'>Nama</td><td>: <b>{p['nama']}</b></td></tr><tr><td colspan='3'></td><td>NIP</td><td>: {p['nip']}</td></tr>" for i, p in enumerate(daftar)])
+        kop_f = f'<div class="text-center"><img src="data:image/png;base64,{logo.GARUDA}" width="75"><br><h2>BUPATI NGADA</h2></div>' if wilayah == "Luar Daerah" else kop_surat
+        rows_peg = "".join([f"<tr><td width='12%'>Kepada</td><td width='5%'>:</td><td width='5%'>{idx+1}.</td><td width='20%'>Nama</td><td>: <b>{p['nama']}</b></td></tr><tr><td colspan='3'></td><td>NIP</td><td>: {p['nip']}</td></tr>" for idx, p in enumerate(list_pegawai)])
         
-        html_final += f'''
+        container_html += f'''
         <div class="kertas">
-            {kop_spt}
+            {kop_f}
             <div class="text-center" style="margin-top:10px;"><h3 class="underline">SURAT PERINTAH TUGAS</h3><p>Nomor: {no_spt}</p></div>
             <table class="visum-table"><tr><td width="12%">Dasar</td><td width="5%">:</td><td>{anggaran}</td></tr></table>
             <p class="text-center text-bold" style="margin:10px 0;">MEMERINTAHKAN:</p>
-            <table class="visum-table">{p_rows}</table>
+            <table class="visum-table">{rows_peg}</table>
             <table class="visum-table" style="margin-top:20px;"><tr><td width="12%">Untuk</td><td width="5%">:</td><td>{maksud} ke {tujuan} selama {lama}.</td></tr></table>
-            {get_ttd_html(80)}
+            {render_ttd(80)}
         </div>'''
 
-    # --- RENDER SPD DEPAN ---
+    # BAGIAN SPD
     if "SPD Depan" in opsi_cetak:
-        for p in daftar:
-            html_final += f'''
+        for p in list_pegawai:
+            container_html += f'''
             <div class="kertas">
-                {kop_pemda}
+                {kop_surat}
                 <div style="margin-left:60%; line-height:1.1; font-size:9pt;">
-                    Nomor SPD: {p['spd']}<br>Lembar ke: {p['lembar']}<br>Kode No: {kode_spd}
+                    Nomor SPD: {p['spd']}<br>Lembar ke: {p['lbr']}
                 </div>
                 <div class="text-center"><h3 class="underline">SURAT PERJALANAN DINAS (SPD)</h3></div>
                 <table class="tabel-border" style="margin-top:10px;">
-                    <tr><td width="5%">1</td><td width="40%">Pejabat Pemberi Perintah</td><td><b>BUPATI NGADA</b></td></tr>
+                    <tr><td width="5%">1</td><td width="42%">Pejabat Pemberi Perintah</td><td><b>BUPATI NGADA</b></td></tr>
                     <tr><td>2</td><td>Nama Pegawai diperintah</td><td><b>{p['nama']}</b></td></tr>
                     <tr><td rowspan="2">3</td><td>a. Pangkat / Golongan</td><td>{p['gol']}</td></tr>
                     <tr><td>b. Jabatan</td><td>{p['jab']}</td></tr>
                     <tr><td>4</td><td>Maksud Perjalanan</td><td>{maksud}</td></tr>
-                    <tr><td>5</td><td>Alat Angkut</td><td>{alat}</td></tr>
-                    <tr><td rowspan="2">6</td><td>a. Tempat Berangkat</td><td>Bajawa</td></tr>
-                    <tr><td>b. Tempat Tujuan</td><td>{tujuan}</td></tr>
-                    <tr><td rowspan="3">7</td><td>a. Lamanya Perjalanan</td><td>{lama}</td></tr>
-                    <tr><td>b. Tanggal Berangkat</td><td>{tgl_bkt}</td></tr>
-                    <tr><td>c. Tanggal Kembali</td><td>{tgl_kbl}</td></tr>
+                    <tr><td>5</td><td>Tempat Tujuan</td><td>{tujuan}</td></tr>
+                    <tr><td>6</td><td>Lamanya Perjalanan</td><td>{lama}</td></tr>
+                    <tr><td>7</td><td>Tanggal Berangkat</td><td>{tgl_bkt}</td></tr>
                 </table>
-                {get_ttd_html(60)}
+                {render_ttd(60)}
             </div>'''
 
-    html_final += '</div>'
-    st.markdown(html_final, unsafe_allow_html=True)
+    container_html += '</div>'
+    
+    # PERINTAH RENDER (Wajib pakai unsafe_allow_html=True)
+    st.markdown(container_html, unsafe_allow_html=True)
 
-# --- MENU REGISTER ---
-elif tab_menu == "Kelola Register":
-    st.subheader("📂 RIWAYAT REGISTER SPD")
-    if st.session_state.arsip_register:
-        df = pd.DataFrame(st.session_state.arsip_register)
-        st.dataframe(df, use_container_width=True)
-        if st.button("🗑️ Hapus Semua Data"):
-            st.session_state.arsip_register = []
-            st.rerun()
-    else:
-        st.info("Belum ada data yang tersimpan.")
+elif menu == "Kelola Register":
+    st.title("📂 Register SPD")
+    st.info("Fitur register data sedang dalam pengembangan.")
